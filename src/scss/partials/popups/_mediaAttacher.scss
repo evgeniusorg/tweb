@@ -18,7 +18,7 @@
       //max-height: unquote('min(640px, 100%)');
       max-height: 100%;
 
-      img, 
+      img,
       video {
         border-radius: inherit;
       }
@@ -32,7 +32,7 @@
       margin-bottom: 9px;
       padding: 12px 20px 15px;
       position: relative;
-  
+
       .btn-primary {
         width: auto;
         height: 2.25rem;
@@ -187,7 +187,7 @@
       position: absolute;
     }
 
-    img, 
+    img,
     video {
       object-fit: cover;
       width: 100%;
@@ -213,6 +213,42 @@
 
   .popup-photo > .popup-item + .popup-item {
     margin-top: .5rem;
+  }
+
+  .popup-item-menu {
+    visibility: hidden;
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 4px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(17.5px);
+    transform: translateX(-50%);
+    max-width: 100%;
+
+    .button-icon {
+      color: rgba(255, 255, 255, 0.7);
+      transition: color .1s ease 0s;
+    }
+
+    .btn-icon {
+      padding: 6px;
+      font-size: 20px;
+
+      &:hover .button-icon {
+        color: rgba(255, 255, 255, 1);
+      }
+    }
+  }
+
+  .popup-item-media:hover .popup-item-menu  {
+    visibility: visible;
+    color: rgba(255, 255, 255, 1);
   }
 
   .drop {

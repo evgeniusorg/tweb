@@ -54,6 +54,10 @@ import {ChatType} from '../chat/chat';
 import pause from '../../helpers/schedulers/pause';
 import {Accessor, createRoot, createSignal, Setter} from 'solid-js';
 import SelectedEffect from '../chat/selectedEffect';
+import findUpAttribute from '../../helpers/dom/findUpAttribute';
+import appSidebarRight from '../sidebarRight';
+import AppImageEditorTab from '../sidebarRight/tabs/ImageEditor/imageEditor';
+import ButtonIcon from '../buttonIcon';
 
 type SendFileParams = SendFileDetails & {
   file?: File,
@@ -299,33 +303,6 @@ export default class PopupNewMedia extends PopupElement {
       }
     });
 
-    let target: HTMLElement, isMedia: boolean, item: SendFileParams;
-    createContextMenu({
-      buttons: [{
-        icon: 'mediaspoiler',
-        text: 'EnablePhotoSpoiler',
-        onClick: () => {
-          this.applyMediaSpoiler(item);
-        },
-        verify: () => isMedia && !item.mediaSpoiler
-      }, {
-        icon: 'mediaspoileroff',
-        text: 'DisablePhotoSpoiler',
-        onClick: () => {
-          this.removeMediaSpoiler(item);
-        },
-        verify: () => !!(isMedia && item.mediaSpoiler)
-      }],
-      listenTo: this.mediaContainer,
-      listenerSetter: this.listenerSetter,
-      findElement: (e) => {
-        target = findUpClassName(e.target, 'popup-item');
-        isMedia = target.classList.contains('popup-item-media');
-        item = this.willAttach.sendFileDetails.find((i) => i.itemDiv === target);
-        return target;
-      }
-    });
-
     if(this.chat.type !== ChatType.Scheduled) {
       createRoot((dispose) => {
         this.chat.destroyMiddlewareHelper.onDestroy(dispose);
@@ -545,10 +522,14 @@ export default class PopupNewMedia extends PopupElement {
 
   public changeSpoilers(toggle: boolean) {
     this.partition().media.forEach((item) => {
+      const btn = item.itemDiv.querySelector('[btnType="spoiler"]')
+
       if(toggle && !item.mediaSpoiler) {
         this.applyMediaSpoiler(item);
+        btn.replaceChildren(ButtonIcon('mediaspoileroff'));
       } else if(!toggle && item.mediaSpoiler) {
         this.removeMediaSpoiler(item);
+        btn.replaceChildren(ButtonIcon('mediaspoiler'));
       }
     });
   }
@@ -748,6 +729,38 @@ export default class PopupNewMedia extends PopupElement {
     return scaledBlob && {url, blob: scaledBlob};
   }
 
+  private openImageEditor(fileIndex: number) {
+    appSidebarRight.createTab(AppImageEditorTab).open(fileIndex, [...this.files]);
+    this.hide();
+    appSidebarRight.toggleSidebar(true);
+  }
+  private onMediaFileClick = (e: MouseEvent) => {
+    const mediaElement = findUpClassName(e.target, 'popup-item');
+    const fileIndex = this.willAttach.sendFileDetails.findIndex((i) => i.itemDiv === mediaElement);
+    const file = this.willAttach.sendFileDetails[fileIndex];
+    const btn = findUpAttribute(e.target, 'btnType');
+
+    if(!btn) {
+      return;
+    }
+
+    const btnType = btn.getAttribute('btnType');
+
+    switch(btnType) {
+      case 'delete':
+        this.deleteFile(file);
+        break;
+      case 'spoiler':
+        const isSpoiler = Boolean(file.mediaSpoiler);
+        isSpoiler ? this.removeMediaSpoiler(file) : this.applyMediaSpoiler(file, false);
+        btn.replaceChildren(ButtonIcon(isSpoiler ? 'mediaspoiler' : 'mediaspoileroff'));
+        break;
+      case 'imageEditor':
+        this.openImageEditor(fileIndex);
+        break;
+    }
+  }
+
   private async attachMedia(params: SendFileParams) {
     const {itemDiv} = params;
     itemDiv.classList.add('popup-item-media');
@@ -827,6 +840,33 @@ export default class PopupNewMedia extends PopupElement {
         ]).then(() => {});
       }
     }
+
+    const navDiv = document.createElement('div');
+    navDiv.classList.add('popup-item-menu');
+
+    if(!isVideo) {
+      const imageEditorBtn = document.createElement('div');
+      imageEditorBtn.setAttribute('btnType', 'imageEditor');
+      imageEditorBtn.append(ButtonIcon('icon_settings'));
+      navDiv.append(imageEditorBtn);
+    }
+
+    const spoilerBtn = document.createElement('div');
+    spoilerBtn.setAttribute('btnType', 'spoiler');
+    spoilerBtn.append(ButtonIcon('mediaspoiler'));
+    navDiv.append(spoilerBtn);
+
+    if(this.willAttach.sendFileDetails.length > 1) {
+      const deleteBtn = document.createElement('div');
+      deleteBtn.setAttribute('btnType', 'delete');
+      deleteBtn.append(ButtonIcon('binfilled'));
+      navDiv.append(deleteBtn);
+    }
+
+    navDiv.style.width = `${36 * navDiv.children.length + 4}px`;
+    itemDiv.append(navDiv);
+
+    attachClickEvent(itemDiv, this.onMediaFileClick);
   }
 
   private async attachDocument(params: SendFileParams): ReturnType<PopupNewMedia['attachMedia']> {
@@ -943,6 +983,12 @@ export default class PopupNewMedia extends PopupElement {
       itemDiv.style.backgroundColor = '#000';
       console.error('error rendering file', err);
     });
+  };
+
+  private deleteFile(params: SendFileParams) {
+    this.willAttach.sendFileDetails = this.willAttach.sendFileDetails.filter((i) => i.file !== params.file);
+    this.files = this.files.filter((i) => i !== params.file);
+    this.attachFiles();
   };
 
   private shouldCompress(mimeType: string) {
