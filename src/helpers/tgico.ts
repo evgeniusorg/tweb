@@ -1,4 +1,6 @@
 export const TGICO_CLASS = 'tgico';
+export const TGICO_CUSTOM_CLASS = 'tgico_custom';
+
 export default function tgico(icon: Icon) {
   return [TGICO_CLASS, _tgico(icon)];
 }
