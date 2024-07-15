@@ -33,6 +33,7 @@ export default class RangeSelector {
   protected withTransition = false;
   protected useTransform = false;
   protected vertical = false;
+  protected fromCenter = false;
 
   constructor(
     options: {
@@ -41,7 +42,8 @@ export default class RangeSelector {
       max?: RangeSelector['max'],
       withTransition?: RangeSelector['withTransition'],
       useTransform?: RangeSelector['useTransform'],
-      vertical?: RangeSelector['vertical']
+      vertical?: RangeSelector['vertical'],
+      fromCenter?: boolean
     },
     value = 0
   ) {
@@ -67,7 +69,7 @@ export default class RangeSelector {
     this.setMinMax(this.min, this.max);
     seek.value = '' + value;
 
-    if(value) {
+    if(this.min !== value) {
       this.setProgress(value);
     }
 
@@ -140,7 +142,19 @@ export default class RangeSelector {
     if(this.useTransform) {
       this.filled.style.transform = `scaleX(${percents})`;
     } else {
-      this.filled.style.width = (percents * 100) + '%';
+      if(this.fromCenter) {
+        if(value >= 0) {
+          this.filled.style.width = (percents * 100 - 50) + '%';
+          this.filled.style.left = '50%';
+          this.filled.classList.remove('progress-line__filled--revert');
+        } else {
+          this.filled.style.width = (50 - percents * 100) + '%';
+          this.filled.style.left = (percents * 100) + '%';
+          this.filled.classList.add('progress-line__filled--revert');
+        }
+      } else {
+        this.filled.style.width = (percents * 100) + '%';
+      }
     }
   }
 

@@ -4,7 +4,6 @@
  * https://github.com/morethanwords/tweb/blob/master/LICENSE
  */
 
-import RangeSelector from '../../rangeSelector';
 import Button from '../../button';
 import CheckboxField from '../../checkboxField';
 import RadioField from '../../radioField';
@@ -12,7 +11,7 @@ import rootScope from '../../../lib/rootScope';
 import {IS_APPLE, IS_SAFARI} from '../../../environment/userAgent';
 import Row from '../../row';
 import AppBackgroundTab from './background';
-import I18n, {LangPackKey, _i18n, join} from '../../../lib/langPack';
+import I18n, {LangPackKey, _i18n} from '../../../lib/langPack';
 import {attachClickEvent} from '../../../helpers/dom/clickEvent';
 import {BaseTheme} from '../../../layer';
 import eachMinute from '../../../helpers/eachMinute';
@@ -30,64 +29,7 @@ import liteMode from '../../../helpers/liteMode';
 import AppPowerSavingTab from './powerSaving';
 import {toastNew} from '../../toast';
 import {joinDeepPath} from '../../../helpers/object/setDeepProperty';
-
-export class RangeSettingSelector {
-  public container: HTMLDivElement;
-  public valueContainer: HTMLElement;
-  private range: RangeSelector;
-
-  public onChange: (value: number) => void;
-
-  constructor(
-    name: LangPackKey,
-    step: number,
-    initialValue: number,
-    minValue: number,
-    maxValue: number,
-    writeValue = true
-  ) {
-    const BASE_CLASS = 'range-setting-selector';
-    this.container = document.createElement('div');
-    this.container.classList.add(BASE_CLASS);
-
-    const details = document.createElement('div');
-    details.classList.add(BASE_CLASS + '-details');
-
-    const nameDiv = document.createElement('div');
-    nameDiv.classList.add(BASE_CLASS + '-name');
-    _i18n(nameDiv, name);
-
-    const valueDiv = this.valueContainer = document.createElement('div');
-    valueDiv.classList.add(BASE_CLASS + '-value');
-
-    if(writeValue) {
-      valueDiv.innerHTML = '' + initialValue;
-    }
-
-    details.append(nameDiv, valueDiv);
-
-    this.range = new RangeSelector({
-      step,
-      min: minValue,
-      max: maxValue
-    }, initialValue);
-    this.range.setListeners();
-    this.range.setHandlers({
-      onScrub: value => {
-        if(this.onChange) {
-          this.onChange(value);
-        }
-
-        if(writeValue) {
-          // console.log('font size scrub:', value);
-          valueDiv.innerText = '' + value;
-        }
-      }
-    });
-
-    this.container.append(details, this.range.container);
-  }
-}
+import {RangeSettingSelector} from '../../rangeSettingSelector';
 
 export default class AppGeneralSettingsTab extends SliderSuperTabEventable {
   public static getInitArgs() {

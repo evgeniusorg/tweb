@@ -37,7 +37,7 @@
       z-index: 3;
     }
   }
-  
+
   @include respond-to(floating-left-sidebar) {
     display: flex;
     position: fixed;
@@ -49,7 +49,7 @@
     transform: translate3d(-5rem, 0, 0);
     transition: transform var(--layer-transition);
     max-width: unset;
-    
+
     body.animation-level-0 & {
       transition: none;
     }
@@ -101,7 +101,7 @@
 
       &:not(.hide) + #folders-container {
         height: calc(100% - var(--scrollable-size));
-  
+
         .scrollable {
           padding-top: .5rem;
         }
@@ -109,7 +109,7 @@
         .dialogs-placeholder-canvas {
           top: .5rem;
         }
-  
+
         /* .chatlist {
           top: .5rem;
         } */
@@ -145,7 +145,7 @@
   /* .folders-tabs-scrollable {
     .menu-horizontal-div-item:first-child {
       margin-inline-start: .6875rem;
-  
+
       @include respond-to(handhelds) {
         margin-inline-start: .1875rem;
       }
@@ -176,7 +176,7 @@
           padding-inline-start: calc(var(--paddingLeft) + 8px - var(--border-width));
         }
       }
-      
+
       &.is-picked-twice {
         .is-first {
           width: 30px;
@@ -200,7 +200,7 @@
         height: 1.5rem;
       }
     }
-  
+
     .search-helper {
       display: flex;
       margin-inline-start: 28px;
@@ -222,10 +222,10 @@
         }
       }
     }
-    
+
     .search-super-tabs-scrollable {
-      flex: 0 0 auto; 
-      position: relative !important; 
+      flex: 0 0 auto;
+      position: relative !important;
 
       &:before {
         display: none;
@@ -270,7 +270,7 @@
     .scrollable-y {
       background-color: transparent;
       position: absolute;
-      
+
       &.active { // fix safari 14.0.2 scrollHeight
         display: block;
       }
@@ -390,7 +390,7 @@
       &-subtitle {
         display: none;
       }
-  
+
       &-title {
         max-width: 65px;
         padding-bottom: .75rem;
@@ -412,12 +412,12 @@
 
     .search-group-scrollable {
       position: relative;
-      
+
       @include respond-to(handhelds) {
         margin-inline-start: -7px;
         margin-top: 4px;
       }
-      
+
       > .scrollable {
         position: relative;
       }
@@ -433,7 +433,7 @@
     }
 
     .btn-corner {
-      &:not(.menu-open) .animated-button-icon-icon-first, 
+      &:not(.menu-open) .animated-button-icon-icon-first,
       &.menu-open .animated-button-icon-icon-last {
         visibility: visible;
         animation: grow-icon .4s forwards ease-in-out;
@@ -466,7 +466,7 @@
     padding: 0 .5rem .5rem;
     overflow: hidden;
     flex: 0 0 auto;
-    
+
     &:not(.is-shown) {
       .connection-status-button {
         display: none;
@@ -475,7 +475,7 @@
 
     &.is-shown {
       &.animating {
-        .connection-status-button, 
+        .connection-status-button,
         & + .connection-status-bottom {
           transition: transform var(--layer-transition);
         }
@@ -621,8 +621,8 @@
   }
 }
 
-.chat-folders-container, 
-.edit-folder-container, 
+.chat-folders-container,
+.edit-folder-container,
 .people-nearby-container {
   user-select: none;
 
@@ -746,7 +746,7 @@
     @include respond-to(handhelds) {
       padding-bottom: .5rem;
     }
-  
+
     &-content {
       @include respond-to(not-handhelds) {
         margin: 0 .5rem;
@@ -763,7 +763,7 @@
       }
 
       @include respond-to(handhelds) {
-        > .checkbox-ripple, 
+        > .checkbox-ripple,
         > .btn-primary {
           border-radius: 0;
         }
@@ -781,7 +781,7 @@
         position: relative;
       }
     }
-  
+
     &-name {
       padding: 1rem;
 
@@ -968,7 +968,7 @@
       line-height: var(--line-height-12);
     }
 
-    &-midtitle, 
+    &-midtitle,
     &-subtitle {
       white-space: nowrap;
       overflow: hidden;
@@ -995,6 +995,10 @@
 
   &-value {
     color: var(--secondary-text-color);
+
+    &--highlight {
+      color: var(--primary-color);
+    }
   }
 
   &-option {
@@ -1140,7 +1144,7 @@
   margin: 0 auto;
   padding: 0 1rem;
   position: relative;
-  
+
   .media-sticker-wrapper {
     width: 128px;
     height: 128px;
@@ -1172,7 +1176,7 @@
     opacity: 0;
 
     @include animation-level(2) {
-      transition: opacity .2s ease-in-out;  
+      transition: opacity .2s ease-in-out;
     }
 
     &-icon {
