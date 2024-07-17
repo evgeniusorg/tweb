@@ -24,6 +24,8 @@ export default class AppImageEditorTab extends SliderSuperTab {
   private settings: HTMLElement;
   private cropPreview: HTMLElement;
   private canvas: HTMLCanvasElement;
+  private redoBtn: HTMLElement;
+  private undoBtn: HTMLElement;
 
   private initFile: File;
   private allFiles: File[];
@@ -95,6 +97,16 @@ export default class AppImageEditorTab extends SliderSuperTab {
     headerBtns.classList.add('image-editor-header-btns');
     header.append(headerBtns);
 
+    this.undoBtn = ButtonIcon('icon_undo');
+    attachClickEvent(this.undoBtn, this.undo.bind(this));
+    this.undoBtn.setAttribute('disabled', 'true');
+    headerBtns.append(this.undoBtn);
+
+    this.redoBtn = ButtonIcon('icon_redo');
+    attachClickEvent(this.redoBtn, this.redo.bind(this));
+    this.redoBtn.setAttribute('disabled', 'true');
+    headerBtns.append(this.redoBtn);
+
     this.cropPreview = document.createElement('div');
     this.cropPreview.classList.add('image-editor-crop-preview');
 
@@ -131,6 +143,49 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
     this.closeBtn.replaceChildren(Icon('close'));
     attachClickEvent(this.closeBtn, () => this.closeEditor(this.allFiles));
+  }
+
+  private reRenderCanvas() {
+  }
+
+  private updateHistory() {
+    this.prevSteps.push(structuredClone(this.state));
+    this.undoBtn.removeAttribute('disabled');
+
+    this.nextSteps = [];
+    this.redoBtn.setAttribute('disabled', 'true');
+  }
+
+  private undo() {
+    if(this.prevSteps.length < 2) return;
+
+    this.nextSteps.push(structuredClone(this.prevSteps.pop()));
+    this.redoBtn.removeAttribute('disabled');
+
+    this.state = structuredClone(this.prevSteps[this.prevSteps.length - 1]);
+
+    if(this.prevSteps.length < 2) {
+      this.undoBtn.setAttribute('disabled', 'true');
+    }
+
+    this.onSelectTab(this.prevTabId, true);
+    this.reRenderCanvas();
+  }
+
+  private redo() {
+    if(this.nextSteps.length === 0) return;
+
+    this.state = structuredClone(this.nextSteps.pop());
+    this.prevSteps.push(structuredClone(this.state));
+
+    this.onSelectTab(this.prevTabId, true);
+    this.reRenderCanvas();
+
+    this.undoBtn.removeAttribute('disabled');
+
+    if(this.nextSteps.length === 0) {
+      this.redoBtn.setAttribute('disabled', 'true');
+    }
   }
 
   private closeEditor(files: File[]) {
@@ -181,6 +236,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
         ...this.state.cropper,
         ...this.cropper.getParams(),
       };
+      this.reRenderCanvas();
     }
 
     switch(tabType) {
@@ -239,6 +295,14 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.content.append(btnDone);
 
     attachClickEvent(btnDone, (e) => {
+      if (this.prevTabId === TabTypes.crop) {
+        this.state.cropper = {
+          ...this.state.cropper,
+          ...this.cropper.getParams(),
+        };
+        this.reRenderCanvas();
+      }
+
       this.canvas.toBlob((blob) => {
         const newFilesList = [...this.allFiles];
         const newFile = new File([blob], this.initFile.name, {type: this.initFile.type});
