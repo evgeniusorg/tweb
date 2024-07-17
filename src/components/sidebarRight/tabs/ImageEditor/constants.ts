@@ -1,5 +1,30 @@
 import {CropperFormat} from './types';
 
+export enum TabTypes {
+  filters,
+  crop,
+  text,
+  brush,
+  emoji
+}
+
+export const TABS = [{
+  type: TabTypes.filters,
+  icon: 'icon_settings'
+}, {
+  type: TabTypes.crop,
+  icon: 'icon_crop'
+}, {
+  type: TabTypes.text,
+  icon: 'icon_text'
+}, {
+  type: TabTypes.brush,
+  icon: 'icon_brush'
+}, {
+  type: TabTypes.emoji,
+  icon: 'icon_smile'
+}];
+
 export enum FilterTypes {
   enhance = 'enhance',
   brightness = 'brightness',
@@ -13,7 +38,6 @@ export enum FilterTypes {
   grain = 'grain',
   sharpen = 'sharpen'
 }
-
 
 export enum CropperFormatTypes {
   free = 'free',

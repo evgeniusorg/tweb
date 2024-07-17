@@ -1,7 +1,16 @@
 import {SliderSuperTab} from '../../../slider';
+import {attachClickEvent} from '../../../../helpers/dom/clickEvent';
+import PopupElement from '../../../popups';
+import PopupNewMedia from '../../../popups/newMedia';
+import appImManager from '../../../../lib/appManagers/appImManager';
+import ButtonCorner from '../../../buttonCorner';
 import readBlobAsDataURL from '../../../../helpers/blob/readBlobAsDataURL';
+import ripple from '../../../ripple';
+import ButtonIcon from '../../../buttonIcon';
+import {horizontalMenu} from '../../../horizontalMenu';
+import Icon from '../../../icon';
 import {State} from './types';
-import {CropperFormatTypes} from './constants';
+import {CropperFormatTypes, TABS} from './constants';
 
 export default class AppImageEditorTab extends SliderSuperTab {
   private image: HTMLImageElement;
@@ -13,7 +22,9 @@ export default class AppImageEditorTab extends SliderSuperTab {
   private initFile: File;
   private allFiles: File[];
 
+  private cropper: any;
   private fileIndex: number;
+  private selectedTab: ReturnType<typeof horizontalMenu>;
 
   private prevSteps: State[];
   private nextSteps: State[];
@@ -53,6 +64,9 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
     // clone of selected file
     this.initFile = this.allFiles[fileIndex];
+
+    this.createTabs();
+    this.createDoneBtn();
 
     // preview
     this.preview = document.createElement('div');
@@ -106,6 +120,65 @@ export default class AppImageEditorTab extends SliderSuperTab {
           isMirror: false,
         }
       };
+    });
+
+    this.closeBtn.replaceChildren(Icon('close'));
+    attachClickEvent(this.closeBtn, () => this.closeEditor(this.allFiles));
+  }
+
+  private closeEditor(files: File[]) {
+    this.preview.classList.remove('image-editor-preview-showed');
+
+    this.cropper.removeHandlers();
+    setTimeout(() => {
+      this.preview.remove();
+      PopupElement.createPopup(PopupNewMedia, appImManager.chat, files, 'media');
+    }, 400);
+  }
+
+  private onSelectTab() {}
+
+  private createTabs() {
+    const tabsContainer = document.createElement('div');
+    tabsContainer.classList.add('search-super-tabs-container', 'tabs-container');
+
+    const tabs = document.createElement('nav');
+    tabs.classList.add('menu-horizontal-div');
+
+    tabsContainer.append(tabs);
+    this.content.append(tabsContainer);
+
+    TABS.forEach((tab) => {
+      const menuTab = document.createElement('div');
+      menuTab.classList.add('menu-horizontal-div-item');
+
+      const span = document.createElement('span');
+      span.classList.add('menu-horizontal-div-item-span');
+      const i = document.createElement('i');
+      span.append(ButtonIcon(`${tab.icon}`, {noRipple: true}));
+      span.append(i);
+      menuTab.append(span);
+      ripple(menuTab);
+
+      tabs.append(menuTab);
+    })
+
+    this.selectedTab = horizontalMenu(tabs, tabsContainer, this.onSelectTab.bind(this));
+    this.selectedTab(0);
+  }
+
+  private createDoneBtn() {
+    const btnDone = ButtonCorner({icon: 'check', className: 'is-visible'});
+    this.content.append(btnDone);
+
+    attachClickEvent(btnDone, (e) => {
+      this.canvas.toBlob((blob) => {
+        const newFilesList = [...this.allFiles];
+        const newFile = new File([blob], this.initFile.name, {type: this.initFile.type});
+        newFilesList[this.fileIndex] = newFile;
+        this.closeEditor(newFilesList);
+        this.close();
+      }, this.initFile.type, 1);
     });
   }
 }
