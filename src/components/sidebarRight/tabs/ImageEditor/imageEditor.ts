@@ -9,14 +9,18 @@ import ripple from '../../../ripple';
 import ButtonIcon from '../../../buttonIcon';
 import {horizontalMenu} from '../../../horizontalMenu';
 import Icon from '../../../icon';
-import {State} from './types';
+import {CropperFormat, State} from './types';
 import {
+  CROPPER_CUSTOM_FORMATS,
+  CROPPER_DEFAULT_FORMATS,
   CropperFormatTypes,
   PreviewTypes,
   TABS,
   TabTypes
 } from './constants';
+import {_i18n} from '../../../../lib/langPack';
 import imageCropper from "./cropper";
+import findUpClassName from "../../../../helpers/dom/findUpClassName";
 
 export default class AppImageEditorTab extends SliderSuperTab {
   private image: HTMLImageElement;
@@ -146,6 +150,23 @@ export default class AppImageEditorTab extends SliderSuperTab {
   }
 
   private reRenderCanvas() {
+    this.canvas.width = this.state.cropper.width;
+    this.canvas.height = this.state.cropper.height;
+
+    const context = this.canvas.getContext('2d');
+    context.save();
+    context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    context.translate(this.canvas.width / 2,this.canvas.height / 2);
+    context.rotate(this.state.cropper.degree * Math.PI / 180);
+    context.translate(- this.canvas.width / 2,- this.canvas.height / 2);
+
+    context.drawImage(this.image,
+      this.state.cropper.left, this.state.cropper.top, this.state.cropper.width, this.state.cropper.height,
+      0, 0, this.state.cropper.width, this.state.cropper.height);
+
+    context.restore();
+    context.filter = 'none';
   }
 
   private updateHistory() {
@@ -204,8 +225,74 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
   private showImageFilters() {}
 
+  private getGropperFormatCell(cropperFormat: CropperFormat) {
+    const btn = document.createElement('div');
+    btn.classList.add('btn-menu-item', 'rp-overflow', 'image-editor-cropper-format-cell');
+
+    if(cropperFormat.type === this.state.cropper.type) {
+      btn.classList.add('active');
+    }
+
+    const icon = Icon(cropperFormat.icon as Icon, 'btn-menu-item-icon')
+    if (cropperFormat.needIconRotate) {
+      icon.classList.add('image-editor-cropper-format-cell--rotate');
+    }
+    btn.append(icon);
+
+    const textElement = document.createElement('span');
+    textElement.classList.add('btn-menu-item-text');
+    _i18n(textElement, cropperFormat.langKey);
+    btn.append(textElement);
+
+    btn.dataset.type = cropperFormat.type;
+
+    return btn;
+  }
+
   private showImageCrop() {
     this.cropper = imageCropper(this.image, this.state.cropper);
+
+    const cropTitle = document.createElement('div');
+    cropTitle.classList.add('image-editor-cropper-format-title');
+    _i18n(cropTitle, 'ImageEditor.Cropper.Title');
+    this.settings.replaceChildren(cropTitle);
+
+    const cropSettings = document.createElement('div');
+    cropSettings.classList.add('image-editor-cropper-format-list');
+
+    CROPPER_DEFAULT_FORMATS.forEach((cropperFormat) => {
+      cropSettings.append(this.getGropperFormatCell(cropperFormat));
+    })
+
+    const cropCustomSettings = document.createElement('div');
+    cropCustomSettings.classList.add('image-editor-cropper-format-compact-list');
+    cropSettings.append(cropCustomSettings);
+
+    CROPPER_CUSTOM_FORMATS.forEach((cropperFormat) => {
+      cropCustomSettings.append(this.getGropperFormatCell(cropperFormat));
+    })
+
+    this.settings.append(cropSettings);
+
+    attachClickEvent(cropSettings, (e) => {
+      const cropperFormatCell = findUpClassName(e.target, 'image-editor-cropper-format-cell');
+
+      if(!cropperFormatCell) {
+        return;
+      }
+
+      if (this.state.cropper.type === cropperFormatCell.dataset.type) {
+        return;
+      }
+
+      this.state.cropper.type = cropperFormatCell.dataset.type;
+
+      const activeBtn = cropSettings.getElementsByClassName('active')[0];
+      activeBtn && activeBtn.classList.remove('active');
+      e.target.classList.add('active');
+
+      this.cropper.updateCropFormat(this.state.cropper);
+    });
   }
 
   private showImageText() {

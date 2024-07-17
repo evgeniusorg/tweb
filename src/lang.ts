@@ -2844,7 +2844,32 @@ const lang = {
   'Chat.UploadLimit.Text': {
     'one_value': 'Subscribe to [Telegram Premium]() to increase upload speeds %d time.',
     'other_value': 'Subscribe to [Telegram Premium]() to increase upload speeds %d times.'
-  }
+  },
+  'ImageEditor.Filter.Enhance': 'Enhance',
+  'ImageEditor.Filter.Brightness': 'Brightness',
+  'ImageEditor.Filter.Contrast': 'Contrast',
+  'ImageEditor.Filter.Saturation': 'Saturation',
+  'ImageEditor.Filter.Warmth': 'Warmth',
+  'ImageEditor.Filter.Fade': 'Fade',
+  'ImageEditor.Filter.Highlights': 'Highlights',
+  'ImageEditor.Filter.Shadows': 'Shadows',
+  'ImageEditor.Filter.Vignette': 'Vignette',
+  'ImageEditor.Filter.Grain': 'Grain',
+  'ImageEditor.Filter.Sharpen': 'Sharpen',
+  'ImageEditor.Cropper.Title': 'Aspect ratio',
+  'ImageEditor.Cropper.Free': 'Free',
+  'ImageEditor.Cropper.Original': 'Original',
+  'ImageEditor.Cropper.Square': 'Square',
+  'ImageEditor.Cropper.3:2': '3:2',
+  'ImageEditor.Cropper.2:3': '2:3',
+  'ImageEditor.Cropper.4:3': '4:3',
+  'ImageEditor.Cropper.3:4': '3:4',
+  'ImageEditor.Cropper.5:4': '5:4',
+  'ImageEditor.Cropper.4:5': '4:5',
+  'ImageEditor.Cropper.7:5': '7:5',
+  'ImageEditor.Cropper.5:7': '5:7',
+  'ImageEditor.Cropper.16:9': '16:9',
+  'ImageEditor.Cropper.9:16': '9:16'
 };
 
 export default lang;

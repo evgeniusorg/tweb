@@ -6,7 +6,7 @@ const Icons = {
   icon_3_2 : 'e913',
   icon_4_3 : 'e919',
   icon_5_4 : 'e923',
-  icon_7_6 : 'e924',
+  icon_7_5 : 'e924',
   icon_16_9 : 'e925',
   icon_FrameBlack : 'e922',
   icon_back : 'e900',

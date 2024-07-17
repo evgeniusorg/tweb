@@ -53,7 +53,7 @@ export type ButtonMenuItemOptionsVerifiable = ButtonMenuItemOptions & {
   verify?: () => boolean | Promise<boolean>
 };
 
-function ButtonMenuItem(options: ButtonMenuItemOptions) {
+export function ButtonMenuItem(options: ButtonMenuItemOptions) {
   if(options.element) return [options.separator as HTMLElement, options.element].filter(Boolean);
 
   const {icon, iconDoc, className, text, onClick, checkboxField, noCheckboxClickListener} = options;
