@@ -1,5 +1,20 @@
 import {CropperFormat} from './types';
 
+export enum FilterTypes {
+  enhance = 'enhance',
+  brightness = 'brightness',
+  contrast = 'contrast',
+  saturation = 'saturation',
+  warmth = 'warmth',
+  fade = 'fade',
+  highlights = 'highlights',
+  shadows = 'shadows',
+  vignette = 'vignette',
+  grain = 'grain',
+  sharpen = 'sharpen'
+}
+
+
 export enum CropperFormatTypes {
   free = 'free',
   original = 'original',

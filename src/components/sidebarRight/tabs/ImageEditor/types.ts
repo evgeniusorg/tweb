@@ -1,4 +1,4 @@
-import {CropperFormatTypes} from './constants';
+import {CropperFormatTypes, FilterTypes} from './constants';
 import Icons from '../../../../iconsCustom';
 import {LangPackKey} from '../../../../lib/langPack';
 
@@ -18,4 +18,11 @@ export type Cropper = {
   degree: number;
   type: CropperFormatTypes;
   isMirror: boolean;
+};
+
+export type State = {
+  filters: Partial<Record<FilterTypes, number>>;
+  cropImage: File;
+  cropper: Cropper,
+  layers: any[];
 };
