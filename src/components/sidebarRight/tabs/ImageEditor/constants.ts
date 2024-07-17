@@ -1,5 +1,10 @@
 import {CropperFormat} from './types';
 
+export enum PreviewTypes {
+  crop = 'crop',
+  canvas = 'canvas'
+}
+
 export enum TabTypes {
   filters,
   crop,

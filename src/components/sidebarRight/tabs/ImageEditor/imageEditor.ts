@@ -10,7 +10,13 @@ import ButtonIcon from '../../../buttonIcon';
 import {horizontalMenu} from '../../../horizontalMenu';
 import Icon from '../../../icon';
 import {State} from './types';
-import {CropperFormatTypes, TABS} from './constants';
+import {
+  CropperFormatTypes,
+  PreviewTypes,
+  TABS,
+  TabTypes
+} from './constants';
+import imageCropper from "./cropper";
 
 export default class AppImageEditorTab extends SliderSuperTab {
   private image: HTMLImageElement;
@@ -25,6 +31,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
   private cropper: any;
   private fileIndex: number;
   private selectedTab: ReturnType<typeof horizontalMenu>;
+  private prevTabId: number;
 
   private prevSteps: State[];
   private nextSteps: State[];
@@ -136,7 +143,67 @@ export default class AppImageEditorTab extends SliderSuperTab {
     }, 400);
   }
 
-  private onSelectTab() {}
+  private changePreview(type: PreviewTypes) {
+    this.preview.replaceChildren(type === PreviewTypes.crop ? this.cropPreview : this.canvas);
+  }
+
+  private showImageFilters() {}
+
+  private showImageCrop() {
+    this.cropper = imageCropper(this.image, this.state.cropper);
+  }
+
+  private showImageText() {
+    const textSettings = document.createElement('div');
+    this.settings.replaceChildren(textSettings);
+  }
+
+  private showImageBrushes() {
+    const brushSettings = document.createElement('div');
+    this.settings.replaceChildren(brushSettings);
+  }
+
+  private showImageEmojis() {
+    const emojiSettings = document.createElement('div');
+    this.settings.replaceChildren(emojiSettings);
+  }
+
+  private onSelectTab(id: number, force = false) {
+    const tabType = TABS[id].type;
+
+    if(id === this.prevTabId && !force) {
+      return;
+    }
+
+    if(this.prevTabId === TabTypes.crop) {
+      this.changePreview(PreviewTypes.canvas);
+      this.state.cropper = {
+        ...this.state.cropper,
+        ...this.cropper.getParams(),
+      };
+    }
+
+    switch(tabType) {
+      case TabTypes.filters:
+        this.showImageFilters();
+        break;
+      case TabTypes.crop:
+        this.changePreview(PreviewTypes.crop);
+        this.showImageCrop();
+        break;
+      case TabTypes.text:
+        this.showImageText();
+        break;
+      case TabTypes.brush:
+        this.showImageBrushes();
+        break;
+      case TabTypes.emoji:
+        this.showImageEmojis();
+        break;
+    }
+
+    this.prevTabId = id;
+  }
 
   private createTabs() {
     const tabsContainer = document.createElement('div');
