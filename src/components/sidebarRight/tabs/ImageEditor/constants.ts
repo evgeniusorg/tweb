@@ -1,4 +1,4 @@
-import {CropperFormat} from './types';
+import {CropperFormat, Filter} from './types';
 
 export enum PreviewTypes {
   crop = 'crop',
@@ -43,6 +43,67 @@ export enum FilterTypes {
   grain = 'grain',
   sharpen = 'sharpen'
 }
+
+export const FILTERS: Filter[] = [{
+  type: FilterTypes.enhance,
+  title: 'ImageEditor.Filter.Enhance',
+  disabled: true
+}, {
+  type: FilterTypes.brightness,
+  title: 'ImageEditor.Filter.Brightness',
+  minValue: -100,
+  maxValue: 100,
+  initValue: 0
+}, {
+  type: FilterTypes.contrast,
+  title: 'ImageEditor.Filter.Contrast',
+  minValue: -100,
+  maxValue: 100,
+  initValue: 0
+}, {
+  type: FilterTypes.saturation,
+  title: 'ImageEditor.Filter.Saturation',
+  minValue: -100,
+  maxValue: 100,
+  initValue: 0
+}, {
+  type: FilterTypes.warmth,
+  title: 'ImageEditor.Filter.Warmth',
+  minValue: -100,
+  maxValue: 100,
+  initValue: 0,
+  disabled: true
+}, {
+  type: FilterTypes.fade,
+  title: 'ImageEditor.Filter.Fade',
+  disabled: true
+}, {
+  type: FilterTypes.highlights,
+  title: 'ImageEditor.Filter.Highlights',
+  minValue: -100,
+  maxValue: 100,
+  initValue: 0,
+  disabled: true
+}, {
+  type: FilterTypes.shadows,
+  title: 'ImageEditor.Filter.Shadows',
+  minValue: -100,
+  maxValue: 100,
+  initValue: 0,
+  disabled: true
+}, {
+  type: FilterTypes.vignette,
+  title: 'ImageEditor.Filter.Vignette',
+  disabled: true
+}, {
+  type: FilterTypes.grain,
+  title: 'ImageEditor.Filter.Grain',
+  disabled: true
+}, {
+  type: FilterTypes.sharpen,
+  title: 'ImageEditor.Filter.Sharpen',
+  disabled: true
+}];
 
 export enum CropperFormatTypes {
   free = 'free',

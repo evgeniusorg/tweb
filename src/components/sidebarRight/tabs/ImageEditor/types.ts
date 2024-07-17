@@ -26,3 +26,13 @@ export type State = {
   cropper: Cropper,
   layers: any[];
 };
+
+export type Filter = {
+  type: FilterTypes;
+  title: string;
+  minValue?: number;
+  maxValue?: number;
+  initValue?: number;
+  step?: number;
+  disabled?: boolean;
+}

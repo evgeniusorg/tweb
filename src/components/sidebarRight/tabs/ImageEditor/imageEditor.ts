@@ -9,16 +9,18 @@ import ripple from '../../../ripple';
 import ButtonIcon from '../../../buttonIcon';
 import {horizontalMenu} from '../../../horizontalMenu';
 import Icon from '../../../icon';
+import {RangeSettingSelector} from '../../../rangeSettingSelector';
 import {CropperFormat, State} from './types';
 import {
   CROPPER_CUSTOM_FORMATS,
   CROPPER_DEFAULT_FORMATS,
   CropperFormatTypes,
+  FILTERS,
   PreviewTypes,
   TABS,
   TabTypes
 } from './constants';
-import {_i18n} from '../../../../lib/langPack';
+import {_i18n, LangPackKey} from '../../../../lib/langPack';
 import imageCropper from "./cropper";
 import findUpClassName from "../../../../helpers/dom/findUpClassName";
 
@@ -157,6 +159,23 @@ export default class AppImageEditorTab extends SliderSuperTab {
     context.save();
     context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    const cssFilters: string[] = [];
+    if(this.state.filters.brightness) {
+      cssFilters.push(`brightness(${(this.state.filters.brightness + 100) / 100})`);
+    }
+
+    if(this.state.filters.contrast) {
+      cssFilters.push(`contrast(${this.state.filters.contrast + 100}%)`);
+    }
+
+    if(this.state.filters.saturation) {
+      cssFilters.push(`saturate(${this.state.filters.saturation + 100}%)`);
+    }
+
+    if(cssFilters.length) {
+      context.filter = cssFilters.join(' ');
+    }
+
     context.translate(this.canvas.width / 2,this.canvas.height / 2);
     context.rotate(this.state.cropper.degree * Math.PI / 180);
     context.translate(- this.canvas.width / 2,- this.canvas.height / 2);
@@ -223,7 +242,47 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.preview.replaceChildren(type === PreviewTypes.crop ? this.cropPreview : this.canvas);
   }
 
-  private showImageFilters() {}
+  private showImageFilters() {
+    let timer: ReturnType<typeof setTimeout> = null;
+    const filtersList = document.createElement('div');
+
+    FILTERS.forEach((filter) => {
+      const filterInitValue = typeof filter.initValue === 'number' ? filter.initValue : 0;
+
+      const range = new RangeSettingSelector(
+        filter.title as LangPackKey,
+        filter.step || 1,
+        this.state.filters[filter.type] || filterInitValue,
+        filter.minValue || 0,
+        filter.maxValue || 100,
+        true,
+        true,
+        filterInitValue,
+        filter.minValue < 0
+      );
+
+      range.onChange = (value) => {
+        this.state.filters[filter.type] = value;
+        this.reRenderCanvas();
+
+        if(timer) {
+          clearTimeout(timer);
+        }
+
+        timer = setTimeout(() => this.updateHistory(), 300);
+      };
+
+      const filterContainer = document.createElement('div');
+      if(filter.disabled) {
+        filterContainer.classList.add('image-editor-settings-filter--disabled');
+      }
+
+      filterContainer.append(range.container);
+      filtersList.append(filterContainer);
+    })
+
+    this.settings.replaceChildren(filtersList);
+  }
 
   private getGropperFormatCell(cropperFormat: CropperFormat) {
     const btn = document.createElement('div');
