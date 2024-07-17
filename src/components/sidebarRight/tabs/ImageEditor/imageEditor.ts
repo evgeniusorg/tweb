@@ -12,10 +12,11 @@ import Icon from '../../../icon';
 import {RangeSettingSelector} from '../../../rangeSettingSelector';
 import {CropperFormat, State} from './types';
 import {
+  Colors,
   CROPPER_CUSTOM_FORMATS,
   CROPPER_DEFAULT_FORMATS,
   CropperFormatTypes,
-  FILTERS,
+  FILTERS, FONTS,
   PreviewTypes,
   TABS,
   TabTypes
@@ -308,6 +309,81 @@ export default class AppImageEditorTab extends SliderSuperTab {
     return btn;
   }
 
+  private getColorsList(callback) {
+    const colorsList = document.createElement('div');
+    colorsList.classList.add('image-editor-colors-list');
+
+    Object.entries(Colors).forEach(([type, value]) => {
+      const colorItem = document.createElement('div');
+      colorItem.classList.add('image-editor-colors-list-item');
+      colorItem.style.setProperty('--image-editor-colors-list-item-background', value);
+      colorItem.dataset.type = type;
+      colorsList.append(colorItem);
+    });
+
+    attachClickEvent(colorsList, (e) => {
+      const colorBtn = findUpClassName(e.target, 'image-editor-colors-list-item');
+
+      if(!colorBtn) {
+        return;
+      }
+
+      const activeColorBtn = colorsList.getElementsByClassName('active')[0];
+      activeColorBtn && activeColorBtn.classList.remove('active');
+      e.target.classList.add('active');
+
+      callback(colorBtn.dataset.type);
+    });
+
+    return colorsList;
+  }
+
+  private getFontsList(callback) {
+    const fontsList = document.createElement('div');
+    fontsList.classList.add('image-editor-fonts-list');
+
+    FONTS.forEach(({font, title}) => {
+      const btn = document.createElement('div');
+      btn.classList.add('btn-menu-item', 'rp-overflow', 'image-editor-fonts-list-btn');
+      btn.style.setProperty('font-family', font);
+      btn.append(title);
+      btn.dataset.font = font;
+      fontsList.append(btn);
+    });
+
+    attachClickEvent(fontsList, (e) => {
+      const fontBtn = findUpClassName(e.target, 'image-editor-fonts-list-btn');
+
+      if(!fontBtn) {
+        return;
+      }
+
+      const activeFontBtn = fontsList.getElementsByClassName('active')[0];
+      activeFontBtn && activeFontBtn.classList.remove('active');
+      e.target.classList.add('active');
+
+      callback(activeFontBtn.dataset.font);
+    });
+
+    return fontsList;
+  }
+
+  private getSizingRange(initValue, callback) {
+    const range = new RangeSettingSelector(
+      '',
+      1,
+      initValue,
+      12,
+      64,
+    );
+
+    range.onChange = (value) => {
+      callback(value);
+    };
+
+
+    return range;
+  }
   private showImageCrop() {
     this.cropper = imageCropper(this.image, this.state.cropper);
 
@@ -356,11 +432,40 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
   private showImageText() {
     const textSettings = document.createElement('div');
+
+    const selectColor = (type) => {
+      console.log(type);
+    };
+
+    const selectFont = (font) => {
+      console.log(font);
+    }
+
+    const selectFontSize = (size) => {
+      console.log(size);
+    }
+
+    textSettings.append(this.getColorsList(selectColor));
+    textSettings.append(this.getSizingRange(24, selectFontSize).container);
+    textSettings.append(this.getFontsList(selectFont));
+
     this.settings.replaceChildren(textSettings);
   }
 
   private showImageBrushes() {
     const brushSettings = document.createElement('div');
+
+    const selectColor = (type) => {
+      console.log(type);
+    };
+
+    const selectFontSize = (size) => {
+      console.log(size);
+    }
+
+    brushSettings.append(this.getColorsList(selectColor));
+    brushSettings.append(this.getSizingRange(24, selectFontSize).container);
+
     this.settings.replaceChildren(brushSettings);
   }
 

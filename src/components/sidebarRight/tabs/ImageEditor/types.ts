@@ -1,6 +1,11 @@
-import {CropperFormatTypes, FilterTypes} from './constants';
+import {CropperFormatTypes, FilterTypes, TabTypes} from './constants';
 import Icons from '../../../../iconsCustom';
 import {LangPackKey} from '../../../../lib/langPack';
+
+export type Tab = {
+  type: TabTypes,
+  icon: string
+}
 
 export type CropperFormat = {
   type: CropperFormatTypes;

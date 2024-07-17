@@ -1,4 +1,4 @@
-import {CropperFormat, Filter} from './types';
+import {CropperFormat, Filter, Tab} from './types';
 
 export enum PreviewTypes {
   crop = 'crop',
@@ -13,7 +13,7 @@ export enum TabTypes {
   emoji
 }
 
-export const TABS = [{
+export const TABS: Tab[] = [{
   type: TabTypes.filters,
   icon: 'icon_settings'
 }, {
@@ -201,4 +201,41 @@ export const CROPPER_CUSTOM_FORMATS: CropperFormat[] = [{
   aspectRatio: 9/16,
   icon: 'icon_16_9',
   needIconRotate: true
+}];
+
+export enum Colors {
+  white = '#FFFFFF',
+  red = '#FE4438',
+  orange = '#FF8901',
+  yellow = '#FFD60A',
+  green = '#33C759',
+  lightBlue = '#62E5E0',
+  blue = '#0A84FF',
+  violet = '#BD5CF3'
+};
+
+export const FONTS = [{
+  font: 'Roboto',
+  title: 'Roboto'
+}, {
+  font: 'American Typewriter',
+  title: 'Typewriter'
+}, {
+  font: 'Avenir Next',
+  title: 'Avenir Next'
+}, {
+  font: 'Courier New',
+  title: 'Courier New'
+}, {
+  font: 'Noteworthy',
+  title: 'Noteworthy'
+}, {
+  font: 'Georgia',
+  title: 'Georgia'
+}, {
+  font: 'Papyrus',
+  title: 'Papyrus'
+}, {
+  font: 'Snell Roundhand',
+  title: 'Snell Roundhand'
 }];
