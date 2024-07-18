@@ -70,7 +70,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
       },
       cropImage: null
     }
-    this.prevSteps = [structuredClone(this.state)];
+    this.prevSteps = [];
     this.nextSteps = [];
 
     // settings
@@ -123,8 +123,6 @@ export default class AppImageEditorTab extends SliderSuperTab {
       this.image.src = contents;
       this.image.classList.add('image-editor-crop-preview-init-image');
 
-      this.cropPreview.append(this.image);
-
       this.image.onload = () => {
         const context = this.canvas.getContext('2d');
 
@@ -137,14 +135,16 @@ export default class AppImageEditorTab extends SliderSuperTab {
         );
 
         this.state.cropper = {
-          width: this.canvas.width,
-          height: this.canvas.height,
+          width: this.image.width,
+          height: this.image.height,
           left: 0,
           top: 0,
           degree: 0,
           type: CropperFormatTypes.original,
           isMirror: false,
         }
+
+        this.prevSteps.push(structuredClone(this.state));
       };
     });
 
@@ -195,6 +195,14 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
     this.nextSteps = [];
     this.redoBtn.setAttribute('disabled', 'true');
+  }
+
+  private updateCropperHistory() {
+    this.state.cropper = {
+      ...this.state.cropper,
+      ...this.cropper.getParams(),
+    };
+    this.updateHistory();
   }
 
   private undo() {
@@ -384,8 +392,14 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
     return range;
   }
+
   private showImageCrop() {
-    this.cropper = imageCropper(this.image, this.state.cropper);
+    if(this.cropper) {
+      this.cropper.removeHandlers();
+    }
+
+    this.cropPreview.append(this.image);
+    this.cropper = imageCropper(this.image, this.state.cropper, this.updateCropperHistory.bind(this));
 
     const cropTitle = document.createElement('div');
     cropTitle.classList.add('image-editor-cropper-format-title');

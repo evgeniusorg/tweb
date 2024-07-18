@@ -124,7 +124,7 @@ export enum CropperFormatTypes {
 export const CROPPER_DEFAULT_FORMATS: CropperFormat[] = [{
   type: CropperFormatTypes.free,
   langKey: 'ImageEditor.Cropper.Free',
-  aspectRatio: 3/4,
+  aspectRatio: null,
   icon: 'icon_free',
   needIconRotate: false
 }, {
