@@ -258,4 +258,39 @@
       }
     }
   }
+
+  &-font-styles {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 1rem;
+
+    .btn-icon {
+      border-radius: 10px!important;
+
+      &.active {
+        background-color: var(--light-secondary-text-color);
+        color: var(--secondary-text-color);
+      }
+    }
+
+    &-aligns {
+      display: flex;
+    }
+
+    &-frames {
+      display: flex;
+    }
+  }
+
+  &-fonts-list {
+    .btn-menu-item {
+      height: 3rem;
+
+      &.active {
+        background-color: var(--light-secondary-text-color);
+      }
+    }
+  }
 }
