@@ -2869,7 +2869,8 @@ const lang = {
   'ImageEditor.Cropper.7:5': '7:5',
   'ImageEditor.Cropper.5:7': '5:7',
   'ImageEditor.Cropper.16:9': '16:9',
-  'ImageEditor.Cropper.9:16': '9:16'
+  'ImageEditor.Cropper.9:16': '9:16',
+  'ImageEditor.Text.Size': 'Size'
 };
 
 export default lang;

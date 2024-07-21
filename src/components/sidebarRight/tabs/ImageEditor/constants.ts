@@ -239,3 +239,37 @@ export const FONTS = [{
   font: 'Snell Roundhand',
   title: 'Snell Roundhand'
 }];
+
+export enum TextAlign {
+  left = 'left',
+  center = 'center',
+  right = 'right'
+};
+
+export enum TextFrame {
+  regular = 'regular',
+  black = 'black',
+  white = 'white',
+}
+
+export enum BrushTypes {
+  pen = 'pen',
+}
+
+export enum LayerTypes {
+  text = 'text',
+  brush = 'brush',
+}
+
+export const CANVAS_BORDER_PADDING = 16;
+export const CANVAS_BORDER_CORNER_RADIUS = 8;
+export const CANVAS_FONT_FRAME_WHITE_PADDING = 8;
+
+export const CANVAS_FONT_SIZE_DEFAULT = 24;
+
+export const CANVAS_FONT_LINE_COEFFICIENT = 1.2;
+export const CANVAS_BRUSH_SIZE_DEFAULT = 16;
+
+export const SIZE_RANGE_MIN = 16;
+export const SIZE_RANGE_MAX = 96;
+export const SIZE_RANGE_STEP = 1;
