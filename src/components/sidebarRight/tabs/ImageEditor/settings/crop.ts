@@ -43,7 +43,7 @@ export function showImageCrop(element: HTMLElement, cropper: any, state: State) 
 
     const activeBtn = cropSettings.getElementsByClassName('active')[0];
     activeBtn && activeBtn.classList.remove('active');
-    e.target.classList.add('active');
+    cropperFormatCell.classList.add('active');
 
     cropper.updateCropFormat(state.cropper);
   });

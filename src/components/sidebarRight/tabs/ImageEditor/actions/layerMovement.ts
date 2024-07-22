@@ -1,7 +1,7 @@
 import {LayerMovementEventState, State} from '../types';
 
 function layerMovement(canvas: HTMLCanvasElement, reRender: () => void) {
-  const event_state: LayerMovementEventState = {
+  const eventState: LayerMovementEventState = {
     mouseX: 0,
     mouseY: 0,
     layerLeft: null,
@@ -22,15 +22,14 @@ function layerMovement(canvas: HTMLCanvasElement, reRender: () => void) {
   function startMoving(e: MouseEvent | TouchEvent, state: State, selectedLayerId: number, endMovingCallback: () => void) {
     e.preventDefault();
     e.stopPropagation();
-
-    event_state.mouseX = e.offsetX;
-    event_state.mouseY = e.offsetY;
-    event_state.layer = state.layers[selectedLayerId];
-    event_state.layerLeft = event_state.layer.left;
-    event_state.layerTop = event_state.layer.top;
-    event_state.selectedLayerId = selectedLayerId;
-    event_state.state = state;
-    event_state.endMovingCallback = endMovingCallback;
+    eventState.mouseX = e.offsetX;
+    eventState.mouseY = e.offsetY;
+    eventState.layer = state.layers[selectedLayerId];
+    eventState.layerLeft = eventState.layer.left;
+    eventState.layerTop = eventState.layer.top;
+    eventState.selectedLayerId = selectedLayerId;
+    eventState.state = state;
+    eventState.endMovingCallback = endMovingCallback;
 
     canvas.addEventListener('mousemove', moving);
     canvas.addEventListener('touchmove', moving);
@@ -45,16 +44,16 @@ function layerMovement(canvas: HTMLCanvasElement, reRender: () => void) {
     canvas.removeEventListener('mousemove', moving);
     canvas.removeEventListener('touchmove', moving);
 
-    event_state.endMovingCallback?.();
+    eventState.endMovingCallback?.();
   }
 
   function moving(e: any) {
     e.preventDefault();
     e.stopPropagation();
 
-    event_state.layer.isMoved = true;
-    event_state.layer.left = e.offsetX - (event_state.mouseX - event_state.layerLeft);
-    event_state.layer.top = e.offsetY - (event_state.mouseY - event_state.layerTop);
+    eventState.layer.isMoved = true;
+    eventState.layer.left = e.offsetX - (eventState.mouseX - eventState.layerLeft);
+    eventState.layer.top = e.offsetY - (eventState.mouseY - eventState.layerTop);
     reRender();
   }
 
