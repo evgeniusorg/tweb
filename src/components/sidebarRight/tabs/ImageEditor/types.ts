@@ -1,5 +1,5 @@
 import {
-  BrushTypes,
+  BrushStyles,
   Colors,
   CropperFormatTypes,
   FilterTypes,
@@ -50,7 +50,7 @@ export type State = {
     frame: TextFrame
   },
   brushSettings: {
-    type: BrushTypes;
+    style: BrushStyles;
     color: Colors;
     size: number
   },
@@ -77,17 +77,20 @@ export type TextLayer = {
   left: number;
   top: number;
   cursorPosition: number;
+  needShowCursor: boolean;
   width?: number;
   height?: number;
   isMoved?: boolean;
 }
 
+export type Point = [number, number];
+
 export type BrushLayer = {
   type: LayerTypes;
-  path: string;
+  points: Point[];
   color: Colors;
   size: number;
-  frame: TextFrame;
+  style: BrushStyles;
   left: number;
   top: number;
   width: number;
@@ -116,4 +119,11 @@ export type LayerMovementEventState = {
   layer: Layer,
   state: State,
   endMovingCallback: () => void
+}
+
+export type BrushDrawingEventState = {
+  layer: BrushLayer,
+  endDrawingCallback?: () => void,
+  mouseX: number,
+  mouseY: number,
 }

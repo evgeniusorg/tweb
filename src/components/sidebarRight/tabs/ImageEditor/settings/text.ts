@@ -1,12 +1,21 @@
-import {Colors, FONTS, LayerTypes, TextAlign, TextFrame} from '../constants';
+import {
+  Colors,
+  FONTS,
+  LayerTypes,
+  SIZE_RANGE_FONT_MAX,
+  SIZE_RANGE_FONT_MIN,
+  SIZE_RANGE_UPDATE_HISTORY_DELAY,
+  TextAlign,
+  TextFrame
+} from '../constants';
 import {attachClickEvent} from '../../../../../helpers/dom/clickEvent';
 import findUpClassName from '../../../../../helpers/dom/findUpClassName';
 import ButtonIcon from '../../../../buttonIcon';
-import {resizeTextBoundary} from '../actions/render';
+import {getTextBoundary} from '../actions/render';
 import {State, TextLayer} from '../types';
 import {getColorsList, getSizingRange} from './common';
 
-function getFontStyles(state: State, reRenderCanvas: () => void) {
+function getFontStyles(state: State, reRenderCanvas: () => void, updateHistory: () => void) {
   const fontStyles = document.createElement('div');
   fontStyles.classList.add('image-editor-font-styles');
 
@@ -57,10 +66,21 @@ function getFontStyles(state: State, reRenderCanvas: () => void) {
     activeBtn && activeBtn.classList.remove('active');
     btn.classList.add('active');
 
-    state.textSettings[btn.dataset.type] = btn.dataset.value;
+    if(btn.dataset.type === 'align') {
+      state.textSettings.align = btn.dataset.value as TextAlign;
+    } else {
+      state.textSettings.frame = btn.dataset.value as TextFrame;
+    }
 
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.text) {
-      state.layers[state.selectedLayerId][btn.dataset.type] = btn.dataset.value;
+      const layer = state.layers[state.selectedLayerId] as TextLayer;
+      if(btn.dataset.type === 'align') {
+        layer.align = btn.dataset.value as TextAlign;
+      } else {
+        layer.frame = btn.dataset.value as TextFrame;
+      }
+
+      updateHistory();
       reRenderCanvas();
     }
   });
@@ -68,7 +88,12 @@ function getFontStyles(state: State, reRenderCanvas: () => void) {
   return fontStyles;
 }
 
-function getFontsList(state: State, canvas: HTMLCanvasElement, reRenderCanvas: () => void) {
+function getFontsList(
+  state: State,
+  canvas: HTMLCanvasElement,
+  reRenderCanvas: () => void,
+  updateHistory: () => void
+) {
   const fontsList = document.createElement('div');
   fontsList.classList.add('image-editor-fonts-list');
 
@@ -104,9 +129,10 @@ function getFontsList(state: State, canvas: HTMLCanvasElement, reRenderCanvas: (
       const layer = state.layers[state.selectedLayerId] as TextLayer;
       layer.font = fontBtn.dataset.font;
 
-      const {width, height} = resizeTextBoundary(layer, context);
+      const {width, height} = getTextBoundary(layer, context);
       layer.width = width;
       layer.height = height;
+      updateHistory();
       reRenderCanvas();
     }
   });
@@ -114,7 +140,13 @@ function getFontsList(state: State, canvas: HTMLCanvasElement, reRenderCanvas: (
   return fontsList;
 }
 
-export function showImageText(element: HTMLElement, state: State, canvas: HTMLCanvasElement, reRenderCanvas: () => void) {
+export function showImageText(
+  element: HTMLElement,
+  state: State,
+  canvas: HTMLCanvasElement,
+  reRenderCanvas: () => void,
+  updateHistory: () => void
+) {
   const textSettings = document.createElement('div');
 
   const selectColor = (color: Colors) => {
@@ -122,9 +154,12 @@ export function showImageText(element: HTMLElement, state: State, canvas: HTMLCa
 
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.text) {
       state.layers[state.selectedLayerId].color = color;
+      updateHistory();
       reRenderCanvas();
     }
   };
+
+  let timer: ReturnType<typeof setTimeout> = null;
 
   const selectFontSize = (size: number) => {
     state.textSettings.size = size;
@@ -134,17 +169,27 @@ export function showImageText(element: HTMLElement, state: State, canvas: HTMLCa
       const layer = state.layers[state.selectedLayerId] as TextLayer;
       layer.size = size;
 
-      const {width, height} = resizeTextBoundary(layer, context);
+      const {width, height} = getTextBoundary(layer, context);
       layer.width = width;
       layer.height = height;
       reRenderCanvas();
+
+      if(timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(updateHistory, SIZE_RANGE_UPDATE_HISTORY_DELAY);
     }
   }
 
   textSettings.append(getColorsList(state.textSettings.color, selectColor));
-  textSettings.append(getFontStyles(state, reRenderCanvas));
-  textSettings.append(getSizingRange(state.textSettings.size, selectFontSize).container);
-  textSettings.append(getFontsList(state, canvas, reRenderCanvas));
+  textSettings.append(getFontStyles(state, reRenderCanvas, updateHistory));
+  textSettings.append(getSizingRange(
+    state.textSettings.size,
+    SIZE_RANGE_FONT_MIN,
+    SIZE_RANGE_FONT_MAX,
+    selectFontSize
+  ).container);
+  textSettings.append(getFontsList(state, canvas, reRenderCanvas, updateHistory));
 
   element.replaceChildren(textSettings);
 }

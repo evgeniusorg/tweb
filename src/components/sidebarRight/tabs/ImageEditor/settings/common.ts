@@ -1,4 +1,4 @@
-import {Colors, SIZE_RANGE_MAX, SIZE_RANGE_MIN, SIZE_RANGE_STEP} from '../constants';
+import {Colors, SIZE_RANGE_STEP} from '../constants';
 import {attachClickEvent} from '../../../../../helpers/dom/clickEvent';
 import findUpClassName from '../../../../../helpers/dom/findUpClassName';
 import {RangeSettingSelector} from '../../../../rangeSettingSelector';
@@ -37,13 +37,13 @@ export function getColorsList(initColor: Colors, callback: (value: Colors) => vo
   return colorsList;
 }
 
-export function getSizingRange(initValue: number, callback: (value: number) => void) {
+export function getSizingRange(initValue: number, minValue: number, maxValue: number, callback: (value: number) => void) {
   const range = new RangeSettingSelector(
     'ImageEditor.Text.Size',
     SIZE_RANGE_STEP,
     initValue,
-    SIZE_RANGE_MIN,
-    SIZE_RANGE_MAX
+    minValue,
+    maxValue
   );
 
   range.onChange = (value) => {

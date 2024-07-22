@@ -252,8 +252,13 @@ export enum TextFrame {
   white = 'white',
 }
 
-export enum BrushTypes {
+export enum BrushStyles {
   pen = 'pen',
+  arrow = 'arrow',
+  brush = 'brush',
+  neon = 'neon',
+  blur = 'blur',
+  eraser = 'eraser'
 }
 
 export enum LayerTypes {
@@ -268,8 +273,12 @@ export const CANVAS_FONT_FRAME_WHITE_PADDING = 8;
 export const CANVAS_FONT_SIZE_DEFAULT = 24;
 
 export const CANVAS_FONT_LINE_COEFFICIENT = 1.2;
-export const CANVAS_BRUSH_SIZE_DEFAULT = 16;
+export const CANVAS_BRUSH_SIZE_DEFAULT = 8;
 
-export const SIZE_RANGE_MIN = 16;
-export const SIZE_RANGE_MAX = 96;
+export const SIZE_RANGE_FONT_MIN = 16;
+export const SIZE_RANGE_FONT_MAX = 96;
 export const SIZE_RANGE_STEP = 1;
+export const SIZE_RANGE_BRUSH_MIN = 1;
+export const SIZE_RANGE_BRUSH_MAX = 60;
+
+export const SIZE_RANGE_UPDATE_HISTORY_DELAY = 500;
