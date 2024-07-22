@@ -1,13 +1,12 @@
 import {
   CANVAS_BORDER_CORNER_RADIUS, CANVAS_BORDER_PADDING,
   CANVAS_FONT_FRAME_WHITE_PADDING, Colors,
-  LayerTypes,
   TextAlign,
   TextFrame
 } from '../constants';
 import {BrushLayer, State, TextLayer} from '../types';
 
-export function resizeTextBoundary(layer: TextLayer, context: CanvasRenderingContext2D) {
+export function getTextBoundary(layer: TextLayer, context: CanvasRenderingContext2D) {
   const lines = layer.text.split('/n')
   let maxWidth = 0
   const maxHeight = layer.size * lines.length * 1.2;
@@ -27,6 +26,30 @@ export function resizeTextBoundary(layer: TextLayer, context: CanvasRenderingCon
   }
 }
 
+export function getBrushPathBoundary(layer: BrushLayer) {
+  const strokeWidth = layer.size;
+  let maxX = 0;
+  let maxY = 0;
+  let minX = Infinity;
+  let minY = Infinity;
+
+  layer.points.forEach((point) => {
+    const left = layer.left + point[0];
+    const top = layer.top + point[1];
+
+    if(left > maxX) maxX = left;
+    if(left < minX) minX = left;
+    if(top > maxY) maxY = top;
+    if(top < minY) minY = top;
+  });
+
+  return {
+    width: maxX - minX + layer.size,
+    height: maxY - minY + layer.size,
+    left: minX - layer.size / 2,
+    top: minY - layer.size /2
+  };
+}
 export function renderFilters(canvas: HTMLCanvasElement, state: State) {
   if(Object.keys(state.filters).length === 0) {
     return;
@@ -139,6 +162,23 @@ export function renderSelectedBorder(canvas: HTMLCanvasElement, left: number, to
   context.restore();
 }
 
+export function renderCursor(canvas: HTMLCanvasElement, left: number, top: number, fontSize: number, color: string) {
+  const scaledRatio = canvas.width / canvas.offsetWidth;
+
+  const context = canvas.getContext('2d');
+  context.save();
+
+  context.beginPath();
+  context.moveTo(left * scaledRatio, (top - fontSize) * scaledRatio);
+  context.lineTo(left * scaledRatio, (top + 10) * scaledRatio);
+
+  context.strokeStyle = color;
+  context.lineWidth = 2 * scaledRatio;
+  context.stroke();
+
+  context.restore();
+}
+
 export function renderText(canvas: HTMLCanvasElement, layer: TextLayer, isSelected: boolean, isEdited: boolean) {
   const scaledRatio = canvas.width / canvas.offsetWidth;
 
@@ -160,11 +200,20 @@ export function renderText(canvas: HTMLCanvasElement, layer: TextLayer, isSelect
     }
   }
 
+  function getCursorLeft(line: string) {
+    const cursorPosition = line.length - (linesLength - layer.cursorPosition);
+    const {width} = getTextBoundary({...layer, text: line.slice(0, cursorPosition)}, context);
+    linesLength = -Infinity;
+    return width;
+  }
+
+  let linesLength = 0;
+
   switch(layer.frame) {
     case TextFrame.white: {
       context.fillStyle = layer.color;
       lines.forEach((line, index) => {
-        const {width, height} = resizeTextBoundary({...layer, text: line}, context);
+        const {width, height} = getTextBoundary({...layer, text: line}, context);
 
         context.roundRect(
           (layer.left - CANVAS_FONT_FRAME_WHITE_PADDING + getLeft(width)) * scaledRatio,
@@ -177,50 +226,55 @@ export function renderText(canvas: HTMLCanvasElement, layer: TextLayer, isSelect
       });
 
       lines.forEach((line, index) => {
-        context.fillStyle = layer.color === Colors.white ? '#000' : Colors.white;
-        const {width} = resizeTextBoundary({...layer, text: line}, context);
+        const color = layer.color === Colors.white ? '#000' : Colors.white;
+        const {width} = getTextBoundary({...layer, text: line}, context);
+        const left = layer.left + getLeft(width);
+        const top = layer.top + index * layer.size * 1.2;
 
-        context.fillText(
-          line,
-          (layer.left + getLeft(width)) * scaledRatio,
-          (layer.top + index * layer.size * 1.2
-          ) * scaledRatio
-        );
+        context.fillStyle = color;
+        context.fillText(line, left * scaledRatio, top * scaledRatio);
+
+        linesLength += line.length + Number(!!index) * 2;
+        if(isEdited && layer.needShowCursor && linesLength >= layer.cursorPosition) {
+          renderCursor(canvas, left + getCursorLeft(line), top, layer.size, color);
+        }
       });
       break;
     }
 
     case TextFrame.black: {
       lines.forEach((line, index) => {
-        const {width} = resizeTextBoundary({...layer, text: line}, context);
+        const {width} = getTextBoundary({...layer, text: line}, context);
+        const left = layer.left + getLeft(width);
+        const top = layer.top + index * layer.size * 1.2;
 
         context.strokeStyle = '#000';
         context.lineWidth = 2 * scaledRatio;
-        context.strokeText(
-          line,
-          (layer.left + getLeft(width)) * scaledRatio,
-          (layer.top + index * layer.size * 1.2) * scaledRatio
-        );
+        context.strokeText(line, left * scaledRatio, top * scaledRatio);
         context.fillStyle = layer.color;
-        context.fillText(
-          line,
-          (layer.left + getLeft(width)) * scaledRatio,
-          (layer.top + index * layer.size * 1.2) * scaledRatio
-        );
+        context.fillText(line, left * scaledRatio, top * scaledRatio);
+
+        linesLength += line.length + Number(!!index) * 2;
+        if(isEdited && layer.needShowCursor && linesLength >= layer.cursorPosition) {
+          renderCursor(canvas, left + getCursorLeft(line), top, layer.size, layer.color);
+        }
       });
       break;
     }
 
     default: {
       lines.forEach((line, index) => {
-        const {width} = resizeTextBoundary({...layer, text: line}, context);
+        const {width} = getTextBoundary({...layer, text: line}, context);
+        const left = layer.left + getLeft(width);
+        const top = layer.top + index * layer.size * 1.2;
 
         context.fillStyle = layer.color;
-        context.fillText(
-          line,
-          (layer.left + getLeft(width)) * scaledRatio,
-          (layer.top + index * layer.size * 1.2) * scaledRatio
-        );
+        context.fillText(line, left * scaledRatio, top * scaledRatio);
+
+        linesLength += line.length + Number(!!index) * 2;
+        if(isEdited && layer.needShowCursor && linesLength >= layer.cursorPosition) {
+          renderCursor(canvas, left + getCursorLeft(line), top, layer.size, layer.color);
+        }
       });
       break;
     }
@@ -238,6 +292,36 @@ export function renderText(canvas: HTMLCanvasElement, layer: TextLayer, isSelect
   }
 }
 
-export function renderBrush(canvas: HTMLCanvasElement, layer: BrushLayer, isSelected: boolean) {
+export function renderBrushPath(canvas: HTMLCanvasElement, layer: BrushLayer, isSelected: boolean) {
+  const scaledRatio = canvas.width / canvas.offsetWidth;
 
+  const context = canvas.getContext('2d');
+  context.save();
+  context.beginPath();
+
+  layer.points.forEach((point, index) => {
+    if(index === 0) {
+      context.moveTo((layer.left + point[0]) * scaledRatio, (layer.top + point[1]) * scaledRatio);
+    } else {
+      context.lineTo((layer.left + point[0]) * scaledRatio, (layer.top + point[1]) * scaledRatio);
+    }
+  })
+
+  context.strokeStyle = layer.color;
+  context.lineWidth = layer.size * scaledRatio;
+  context.stroke();
+  context.closePath();
+  context.restore();
+
+  const {width, height, left, top} = getBrushPathBoundary(layer);
+
+  if(isSelected) {
+    renderSelectedBorder(
+      canvas,
+      left - CANVAS_BORDER_PADDING,
+      top - CANVAS_BORDER_PADDING,
+      width + 2 * CANVAS_BORDER_PADDING,
+      height + 2 * CANVAS_BORDER_PADDING
+    );
+  }
 }
