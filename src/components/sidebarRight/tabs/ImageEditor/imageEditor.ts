@@ -11,7 +11,7 @@ import {horizontalMenu} from '../../../horizontalMenu';
 import Icon from '../../../icon';
 import {BrushLayer, State, TextLayer} from './types';
 import {
-  BrushTypes,
+  BrushStyles,
   CANVAS_BORDER_PADDING,
   CANVAS_BRUSH_SIZE_DEFAULT,
   CANVAS_FONT_SIZE_DEFAULT,
@@ -26,13 +26,21 @@ import {
   TextFrame
 } from './constants';
 import layerMovement from './actions/layerMovement';
-import {renderBrush, renderCroppedImage, renderFilters, renderText, resizeTextBoundary} from './actions/render';
+import {
+  renderCroppedImage,
+  renderFilters,
+  renderText,
+  getTextBoundary,
+  renderBrushPath, getBrushPathBoundary
+} from './actions/render';
 import {showImageFilters} from './settings/filters';
 import {showImageCrop} from './settings/crop';
 import {showImageText} from './settings/text';
 import {showImageEmojis} from './settings/emoji';
 import {showImageBrushes} from './settings/brush';
 import imageCropper from './actions/cropper';
+import {keydown, keypress} from './actions/textEditor';
+import brushDrawing from './actions/brushDrawing';
 
 export default class AppImageEditorTab extends SliderSuperTab {
   private image: HTMLImageElement;
@@ -48,9 +56,14 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
   private cropper: any;
   private movement: any;
+  private brushDrawing: any;
+
   private fileIndex: number;
   private selectedTab: ReturnType<typeof horizontalMenu>;
   private prevTabId: number;
+
+  private cursorAnimationTimer: number;
+  private cursorAnimationFrame: any;
 
   private prevSteps: State[];
   private nextSteps: State[];
@@ -88,7 +101,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
         frame: TextFrame.regular
       },
       brushSettings: {
-        type: BrushTypes.pen,
+        style: BrushStyles.pen,
         color: Colors.white,
         size: CANVAS_BRUSH_SIZE_DEFAULT
       },
@@ -112,6 +125,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.onSelectTab = this.onSelectTab.bind(this);
     this.updateHistory = this.updateHistory.bind(this);
     this.updateCropperHistory = this.updateCropperHistory.bind(this);
+    this.cursorAnimation = this.cursorAnimation.bind(this);
 
     this.createTabs();
     this.createDoneBtn();
@@ -131,6 +145,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.canvas.addEventListener('mousedown', this.selectCanvasLayer, false);
     this.canvas.addEventListener('touchstart', this.selectCanvasLayer, false);
     this.movement = layerMovement(this.canvas, this.reRenderCanvas);
+    this.brushDrawing = brushDrawing(this.canvas, this.reRenderCanvas);
 
     const header = document.createElement('div');
     this.header.append(header);
@@ -202,39 +217,51 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.state.layers.forEach((layer, index) => {
       switch(layer.type) {
         case LayerTypes.text:
-          return renderText(this.canvas, layer as TextLayer, this.state.selectedLayerId === index, this.state.editedLayerId === index);
+          return renderText(
+            this.canvas,
+            layer as TextLayer,
+            this.state.selectedLayerId === index,
+            this.state.editedLayerId === index
+          );
         case LayerTypes.brush:
-          return renderBrush(this.canvas, layer as BrushLayer, this.state.selectedLayerId === index);
+          return renderBrushPath(this.canvas, layer as BrushLayer, this.state.selectedLayerId === index);
       }
     });
   }
 
-  private selectCanvasLayer(e: MouseEvent | TouchEvent) {
-    const x = e.offsetX;
-    const y = e.offsetY;
+  private selectCanvasLayer(event: MouseEvent | TouchEvent) {
+    const x = event.offsetX;
+    const y = event.offsetY;
 
-    let selectedLayerId: number = null;
+    function getSelectedLayerId(type: LayerTypes, state: State) {
+      let selectedLayerId: number = null;
 
-    for(let i = this.state.layers.length - 1; i >= 0; i--) {
-      const layer = this.state.layers[i];
-      if(
-        x < layer.left - CANVAS_BORDER_PADDING ||
-        x > layer.left + layer.width + CANVAS_BORDER_PADDING
-      ) continue;
+      for(let i = state.layers.length - 1; i >= 0; i--) {
+        const layer = state.layers[i];
+        if(layer.type !== type) continue;
 
-      if(
-        y < layer.top - layer.size * 0.9 - CANVAS_BORDER_PADDING ||
-        y > layer.top - layer.size * 0.9 + layer.height + CANVAS_BORDER_PADDING
-      ) continue;
+        if(
+          x < layer.left - CANVAS_BORDER_PADDING ||
+          x > layer.left + layer.width + CANVAS_BORDER_PADDING
+        ) continue;
 
-      selectedLayerId = i;
-      break;
+        if(
+          y < layer.top - layer.size * 0.9 - CANVAS_BORDER_PADDING ||
+          y > layer.top - layer.size * 0.9 + layer.height + CANVAS_BORDER_PADDING
+        ) continue;
+
+        selectedLayerId = i;
+        break;
+      }
+
+      return selectedLayerId;
     }
 
     switch(this.prevTabId) {
       case TabTypes.filters:
         return;
       case TabTypes.text: {
+        const selectedLayerId = getSelectedLayerId(LayerTypes.text, this.state);
         if(this.state.editedLayerId !== null) {
           // continue to edit
           if(this.state.editedLayerId === selectedLayerId) {
@@ -252,6 +279,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
           this.state.editedLayerId = null;
           this.endEditText();
           this.reRenderCanvas();
+          this.updateHistory();
           return;
         }
 
@@ -264,7 +292,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
         // add new text
         if(selectedLayerId === null) {
-          this.addNewText(e);
+          this.addNewText(event);
           return;
         }
 
@@ -278,7 +306,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
             size: layer.size,
             font: layer.font
           };
-          showImageText(this.settings, this.state, this.canvas, this.reRenderCanvas);
+          showImageText(this.settings, this.state, this.canvas, this.reRenderCanvas, this.updateHistory);
 
           this.state.selectedLayerId = selectedLayerId;
           this.reRenderCanvas();
@@ -286,17 +314,55 @@ export default class AppImageEditorTab extends SliderSuperTab {
         }
 
         // start moving
-        this.state.layers[selectedLayerId].isMoved = false;
-        this.movement.startMoving(e, this.state, selectedLayerId, () => {
-          if(!this.state.layers[selectedLayerId].isMoved) {
+        const layer = this.state.layers[selectedLayerId] as TextLayer;
+        layer.isMoved = false;
+        this.movement.startMoving(event, this.state, selectedLayerId, () => {
+          if(!layer.isMoved) {
             // start editor without moving
             this.state.editedLayerId = selectedLayerId;
             this.startEditText();
             this.reRenderCanvas();
           }
+          this.updateHistory();
         });
+        return;
       }
       case TabTypes.brush: {
+        const selectedLayerId = getSelectedLayerId(LayerTypes.brush, this.state);
+        // start moving
+        if(this.state.selectedLayerId !== null && this.state.selectedLayerId === selectedLayerId) {
+          this.movement.startMoving(event, this.state, selectedLayerId, () => {
+            this.updateHistory();
+          });
+          return;
+        }
+
+        // hide selection
+        if(this.state.selectedLayerId !== null && selectedLayerId === null) {
+          this.state.selectedLayerId = null;
+          this.reRenderCanvas();
+          return;
+        }
+
+        // select other selection
+        if(selectedLayerId !== null) {
+          this.state.selectedLayerId = selectedLayerId;
+          const layer = this.state.layers[selectedLayerId] as BrushLayer;
+          this.state.brushSettings = {
+            style: layer.style,
+            color: layer.color,
+            size: layer.size
+          };
+          showImageBrushes(this.settings, this.state, this.reRenderCanvas, this.updateHistory);
+          this.reRenderCanvas();
+          return;
+        }
+
+        // add new layer
+        if(selectedLayerId === null) {
+          this.addNewPath(event);
+        }
+
         return;
       }
 
@@ -307,74 +373,41 @@ export default class AppImageEditorTab extends SliderSuperTab {
   }
 
   private keydown(event: KeyboardEvent) {
-    const context = this.canvas.getContext('2d');
-    const layer = this.state.layers[this.state.editedLayerId] as TextLayer;
-
-    if(event.key.toLowerCase() === 'backspace') {
-      if(layer.cursorPosition === 0) return;
-
-      let deletedCharNumber = 1
-      if(layer.cursorPosition > 1 && layer.text.slice(layer.cursorPosition - 2, layer.cursorPosition) === '/n')
-        deletedCharNumber = 2
-
-      layer.text = layer.text.slice(0, layer.cursorPosition - deletedCharNumber) + layer.text.slice(layer.cursorPosition)
-      layer.cursorPosition -= deletedCharNumber
-    }
-
-    if(event.key.toLowerCase() === 'arrowleft') {
-      const steps = layer.cursorPosition > 1 && layer.text.slice(layer.cursorPosition - 2, layer.cursorPosition) === '/n' ? 2 : 1
-      layer.cursorPosition -= steps;
-    }
-
-    if(event.key.toLowerCase() === 'arrowright') {
-      const steps = layer.text.slice(layer.cursorPosition, layer.cursorPosition + 2) === '/n' ? 2 : 1
-      if(layer.text.length <= layer.cursorPosition) return;
-      layer.cursorPosition += steps;
-    }
-
-    const {width, height} = resizeTextBoundary(layer, context);
-    layer.width = width;
-    layer.height = height;
-
-    this.reRenderCanvas();
+    keydown(event, this.canvas, this.state, this.reRenderCanvas, this.updateHistory);
   }
 
   private keypress(event: KeyboardEvent) {
     event.preventDefault();
     event.stopPropagation();
+    keypress(event, this.canvas, this.state, this.reRenderCanvas)
+  }
 
-    const context = this.canvas.getContext('2d');
-    const layer = this.state.layers[this.state.editedLayerId] as TextLayer;
-
-    if(event.key.toLowerCase() === 'enter') {
-      layer.text = layer.text.slice(0, layer.cursorPosition) + '/n' + layer.text.slice(layer.cursorPosition)
-      layer.cursorPosition += 2;
-    } else {
-      let char = String.fromCharCode(event.keyCode)
-
-      if(!char && char !== ' ') return
-      if(!event.shiftKey) char = char.toLowerCase()
-
-      layer.text =
-        layer.text.slice(0, layer.cursorPosition) + char + layer.text.slice(layer.cursorPosition)
-      layer.cursorPosition += 1
+  private cursorAnimation(timeStamp: number) {
+    if(!this.cursorAnimationTimer) {
+      this.cursorAnimationTimer = timeStamp;
     }
 
-    const {width, height} = resizeTextBoundary(layer, context);
-    layer.width = width;
-    layer.height = height;
+    const diff = timeStamp - this.cursorAnimationTimer;
+    if(diff >= 400) {
+      this.cursorAnimationTimer = null;
+      const layer = this.state.layers[this.state.editedLayerId] as TextLayer;
+      if(layer) {
+        layer.needShowCursor = !layer.needShowCursor;
+        this.reRenderCanvas();
+      }
+    }
 
-    this.reRenderCanvas();
+    this.cursorAnimationFrame = window.requestAnimationFrame(this.cursorAnimation);
   }
 
   private startEditText() {
     window.addEventListener('keypress', this.keypress);
-    window.addEventListener('keydown', this.keydown);
+    this.cursorAnimationFrame = window.requestAnimationFrame(this.cursorAnimation);
   }
 
   private endEditText() {
     window.removeEventListener('keypress', this.keypress);
-    window.removeEventListener('keydown', this.keydown);
+    window.cancelAnimationFrame(this.cursorAnimationFrame);
   }
 
   private addNewText(event: MouseEvent | TouchEvent) {
@@ -390,11 +423,12 @@ export default class AppImageEditorTab extends SliderSuperTab {
       align: this.state.textSettings.align,
       frame: this.state.textSettings.frame,
       cursorPosition: defaultText.length,
+      needShowCursor: true,
       left: event.offsetX,
       top: event.offsetY
     };
 
-    const {width, height} = resizeTextBoundary(newText, context);
+    const {width, height} = getTextBoundary(newText, context);
     newText.width = width;
     newText.height = height;
 
@@ -406,8 +440,38 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.reRenderCanvas();
   }
 
-  private addNewPath() {
+  private addNewPath(event: MouseEvent | TouchEvent) {
+    const newPath: BrushLayer = {
+      type: LayerTypes.brush,
+      points: [],
+      color: this.state.brushSettings.color,
+      size: this.state.brushSettings.size,
+      style: this.state.brushSettings.style,
+      left: event.offsetX,
+      top: event.offsetY,
+      width: 0,
+      height: 0
+    };
 
+    this.state.layers.push(newPath);
+    this.brushDrawing.startDrawing(event, newPath, () => {
+      const {width, height, left, top} = getBrushPathBoundary(newPath);
+      const dleft = newPath.left - left;
+      const dtop = newPath.top - top;
+
+      newPath.width = width;
+      newPath.height = height;
+      newPath.left = left;
+      newPath.top = top;
+
+      newPath.points.forEach((point) => {
+        point[0] += dleft;
+        point[1] += dtop;
+      });
+
+      this.updateHistory();
+      this.reRenderCanvas();
+    });
   }
 
   private updateHistory() {
@@ -491,6 +555,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
       this.state.selectedLayerId = null;
       this.reRenderCanvas();
       this.endEditText();
+      window.removeEventListener('keydown', this.keydown);
     }
 
     if(this.prevTabId === TabTypes.crop) {
@@ -501,6 +566,12 @@ export default class AppImageEditorTab extends SliderSuperTab {
       };
       this.cropper.removeHandlers();
       this.reRenderCanvas();
+    }
+
+    if(this.prevTabId === TabTypes.brush) {
+      this.state.selectedLayerId = null;
+      this.reRenderCanvas();
+      window.removeEventListener('keydown', this.keydown);
     }
 
     switch(tabType) {
@@ -519,10 +590,12 @@ export default class AppImageEditorTab extends SliderSuperTab {
         showImageCrop(this.settings, this.cropper, this.state);
         break;
       case TabTypes.text:
-        showImageText(this.settings, this.state, this.canvas, this.reRenderCanvas);
+        window.addEventListener('keydown', this.keydown);
+        showImageText(this.settings, this.state, this.canvas, this.reRenderCanvas, this.updateHistory);
         break;
       case TabTypes.brush:
-        showImageBrushes(this.settings, this.state, this.reRenderCanvas);
+        window.addEventListener('keydown', this.keydown);
+        showImageBrushes(this.settings, this.state, this.reRenderCanvas, this.updateHistory);
         break;
       case TabTypes.emoji:
         showImageEmojis(this.settings);
@@ -557,7 +630,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
       tabs.append(menuTab);
     })
 
-    this.selectedTab = horizontalMenu(tabs, tabsContainer, this.onSelectTab);
+    this.selectedTab = horizontalMenu(tabs, tabsContainer, (id) => this.onSelectTab(id));
     this.selectedTab(TabTypes.filters);
   }
 
