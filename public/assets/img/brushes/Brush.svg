@@ -3,8 +3,8 @@
   <g filter="url(#filter0_iiii_1_265)">
     <path d="M0 1H82.3579C83.4414 1 84.5135 1.22006 85.5093 1.64684L91 4H101C101.552 4 102 4.44772 102 5V15C102 15.5523 101.552 16 101 16H91L85.5093 18.3532C84.5135 18.7799 83.4414 19 82.3579 19H0V1Z" fill="#3E3F3F"/>
   </g>
-  <rect x="76" y="1" width="4" height="18" rx="0.5" fill="#FF8901"/>
-  <path d="M102 5H106.434C106.785 5 107.111 5.1843 107.291 5.4855L112.091 13.4855C112.491 14.152 112.011 15 111.234 15H102V5Z" fill="#FF8901"/>
+  <rect x="76" y="1" width="4" height="18" rx="0.5" needReColor="true" fill="white"/>
+  <path d="M102 5H106.434C106.785 5 107.111 5.1843 107.291 5.4855L112.091 13.4855C112.491 14.152 112.011 15 111.234 15H102V5Z" needReColor="true" fill="white"/>
 </g>
 <defs>
   <filter id="filter0_iiii_1_265" x="0" y="-4" width="105" height="28" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">

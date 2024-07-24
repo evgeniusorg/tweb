@@ -43,7 +43,7 @@ export type State = {
   selectedLayerId: number;
   editedLayerId: number;
   textSettings: {
-    color: Colors;
+    color: string;
     font: string;
     size: number;
     align: TextAlign;
@@ -51,7 +51,7 @@ export type State = {
   },
   brushSettings: {
     style: BrushStyles;
-    color: Colors;
+    color: string;
     size: number
   },
 };
@@ -69,7 +69,7 @@ export type Filter = {
 export type TextLayer = {
   type: LayerTypes.text;
   text: string;
-  color: Colors;
+  color: string;
   font: string;
   size: number;
   align: TextAlign;
@@ -88,7 +88,7 @@ export type Point = [number, number];
 export type BrushLayer = {
   type: LayerTypes.brush;
   points: Point[];
-  color: Colors;
+  color: string;
   size: number;
   style: BrushStyles;
   left: number;
@@ -96,6 +96,7 @@ export type BrushLayer = {
   width: number;
   height: number;
   isMoved?: boolean;
+  isDrawing?: boolean;
 }
 
 export type StickerLayer = {
@@ -140,3 +141,24 @@ export type BrushDrawingEventState = {
 }
 
 export type StickersList = Record<string, any>;
+
+export type Font = {
+  font: string;
+  title: string;
+};
+
+export type Brush = {
+  style: BrushStyles,
+  langKey: string,
+  iconUrl: string,
+  defaultColor?: string,
+  disabled?: boolean
+};
+
+export type BrushIcon = {
+  color: string;
+  text: string;
+  url?: string;
+};
+
+export type BrushIconsList = Partial<Record<BrushStyles, BrushIcon>>;

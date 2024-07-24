@@ -39,6 +39,8 @@ function brushDrawing(canvas: HTMLCanvasElement, reRender: () => void) {
     canvas.removeEventListener('touchend', endDrawing);
     canvas.removeEventListener('mousemove', moving);
     canvas.removeEventListener('touchmove', moving);
+
+    eventState.layer.isDrawing = false;
     eventState.endDrawingCallback?.();
   }
 
@@ -47,7 +49,7 @@ function brushDrawing(canvas: HTMLCanvasElement, reRender: () => void) {
     event.stopPropagation();
 
     const {left, top} = getEventPosition(event, canvas);
-    eventState.layer.isMoved = true;
+    eventState.layer.isDrawing = true;
     eventState.layer.points.push([left - eventState.mouseX, top - eventState.mouseY]);
     reRender();
   }

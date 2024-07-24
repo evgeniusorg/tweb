@@ -4,7 +4,7 @@
   <g filter="url(#filter0_iiii_1_231)">
     <path d="M0 1H92C94.2091 1 96 2.79086 96 5V15C96 17.2091 94.2091 19 92 19H0V1Z" fill="#3E3F3F"/>
   </g>
-  <path d="M92 1C94.2091 1 96 2.79086 96 5V15C96 17.2091 94.2091 19 92 19V1Z" fill="#FFD60A"/>
+  <path d="M92 1C94.2091 1 96 2.79086 96 5V15C96 17.2091 94.2091 19 92 19V1Z" needReColor="true" fill="white"/>
 </g>
 <defs>
   <filter id="filter0_iiii_1_231" x="0" y="-4" width="99" height="28" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
@@ -36,8 +36,8 @@
     <feBlend mode="normal" in2="effect3_innerShadow_1_231" result="effect4_innerShadow_1_231"/>
   </filter>
   <linearGradient id="paint0_linear_11409_398" x1="74" y1="10" x2="58" y2="10" gradientUnits="userSpaceOnUse">
-    <stop offset="0.755" stop-color="#FFD60A"/>
-    <stop offset="1" stop-color="#FFD60A" stop-opacity="0"/>
+    <stop offset="0.755" needReColor="true" stop-color="white"/>
+    <stop offset="1" needReColor="true" stop-color="white" stop-opacity="0"/>
   </linearGradient>
   <clipPath id="clip0_1_231">
     <rect width="20" height="120" fill="white" transform="matrix(0 1 -1 0 120 0)"/>

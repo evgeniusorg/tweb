@@ -8,6 +8,7 @@
 2. Moved RangeSettingSelector to common components:
    1. Added color for selected value;
    2. Added start to center.
+   3. Added custom color
 3. Added menu for image/video on newMedia popout:
    1. Image editor (for photo);
    2. Spoiler;
@@ -27,7 +28,8 @@
    1. Each brush layer can be selected;
    2. Selected layer can be changed (size, color, brush type);
    3. Selected layer can be moved;
-   4. Selected layer can be removed (press 'del', 'backspace').
+   4. Selected layer can be removed (press 'del', 'backspace');
+   5. Each brush image changes color after selection of new color.
 10. Added selector of stickers:
     1. Each sticker layer can be selected;
     2. Selected layer can be moved;
@@ -40,7 +42,6 @@
 4. Add rotation for layers. 
 5. Add all brushes. 
 6. Add selector of custom color for text and brush. 
-7. Add custom color for RangeSettingSelector. 
-8. Refactoring of color frame for text layer. 
-9. Resizing window 
-10. Refactoring of StickersTab class (remove emoticonsDropdown)
+7. Refactoring of color frame for text layer. 
+8. Resizing window 
+9. Refactoring of StickersTab class (remove emoticonsDropdown)

@@ -1,4 +1,4 @@
-import {CropperFormat, Filter, Tab} from './types';
+import {Brush, CropperFormat, Filter, Font, Tab} from './types';
 
 export enum PreviewTypes {
   crop = 'crop',
@@ -214,7 +214,7 @@ export enum Colors {
   violet = '#BD5CF3'
 };
 
-export const FONTS = [{
+export const FONTS: Font[] = [{
   font: 'Roboto',
   title: 'Roboto'
 }, {
@@ -261,23 +261,26 @@ export enum BrushStyles {
   eraser = 'eraser'
 };
 
-export const BRUSHES = [{
+export const BRUSHES: Brush[] = [{
   style: BrushStyles.pen,
   langKey: 'ImageEditor.Brushes.Pen',
-  iconUrl: 'assets/img/brushes/Pen.svg'
+  iconUrl: 'assets/img/brushes/Pen.svg',
+  defaultColor: Colors.white
 }, {
   style: BrushStyles.arrow,
   langKey: 'ImageEditor.Brushes.Arrow',
-  iconUrl: 'assets/img/brushes/Arrow.svg'
+  iconUrl: 'assets/img/brushes/Arrow.svg',
+  defaultColor: Colors.yellow
 }, {
   style: BrushStyles.brush,
   langKey: 'ImageEditor.Brushes.Brush',
   iconUrl: 'assets/img/brushes/Brush.svg',
-  disabled: true
+  defaultColor: Colors.orange
 }, {
   style: BrushStyles.neon,
   langKey: 'ImageEditor.Brushes.Neon',
-  iconUrl: 'assets/img/brushes/Neon.svg'
+  iconUrl: 'assets/img/brushes/Neon.svg',
+  defaultColor: Colors.lightBlue
 }, {
   style: BrushStyles.blur,
   langKey: 'ImageEditor.Brushes.Blur',

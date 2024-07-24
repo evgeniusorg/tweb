@@ -13,7 +13,7 @@ import findUpClassName from '../../../../../helpers/dom/findUpClassName';
 import ButtonIcon from '../../../../buttonIcon';
 import {getTextBoundary} from '../actions/render';
 import {State, TextLayer} from '../types';
-import {getColorsList, getSizingRange} from './common';
+import {getColorsList, getSizingRange, updateRangeSelectorColor} from './common';
 import {_i18n} from '../../../../../lib/langPack';
 
 function getFontStyles(state: State, reRenderCanvas: () => void, updateHistory: () => void) {
@@ -150,7 +150,7 @@ export function showImageText(
 ) {
   const textSettings = document.createElement('div');
 
-  const selectColor = (color: Colors) => {
+  const selectColor = (color: string) => {
     state.textSettings.color = color;
 
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.text) {
@@ -159,6 +159,8 @@ export function showImageText(
       updateHistory();
       reRenderCanvas();
     }
+
+    updateRangeSelectorColor(element, color);
   };
 
   let timer: ReturnType<typeof setTimeout> = null;
@@ -191,6 +193,7 @@ export function showImageText(
     SIZE_RANGE_FONT_MAX,
     selectFontSize
   ).container);
+  updateRangeSelectorColor(textSettings, state.textSettings.color);
 
   const title = document.createElement('div');
   title.classList.add('image-editor-settings-block-title');

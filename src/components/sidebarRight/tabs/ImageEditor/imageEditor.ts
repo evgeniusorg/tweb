@@ -9,8 +9,9 @@ import ripple from '../../../ripple';
 import ButtonIcon from '../../../buttonIcon';
 import {horizontalMenu} from '../../../horizontalMenu';
 import Icon from '../../../icon';
-import {BrushLayer, State, StickerLayer, StickersList, TextLayer} from './types';
+import {BrushIconsList, BrushLayer, State, StickerLayer, StickersList, TextLayer} from './types';
 import {
+  BRUSHES,
   BrushStyles,
   CANVAS_BORDER_PADDING,
   CANVAS_BRUSH_SIZE_DEFAULT,
@@ -40,12 +41,13 @@ import {
 import {showImageFilters} from './settings/filters';
 import {showImageCrop} from './settings/crop';
 import {showImageText} from './settings/text';
-import {showImageBrushes} from './settings/brush';
+import {replaceBrushColorOnText, showImageBrushes} from './settings/brush';
 import imageCropper from './actions/cropper';
 import {keydown, keypress} from './actions/textEditor';
 import brushDrawing from './actions/brushDrawing';
 import {showImageStickers} from './settings/stickers';
 import {getEventPosition} from './actions/eventActions';
+import textToSvgURL from '../../../../helpers/textToSvgURL';
 
 export default class AppImageEditorTab extends SliderSuperTab {
   private image: HTMLImageElement;
@@ -73,6 +75,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
   private prevSteps: State[];
   private nextSteps: State[];
   private stickers: StickersList;
+  private brushIcons: BrushIconsList;
   private state: State;
 
   public init(
@@ -115,6 +118,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
     }
 
     this.stickers = {};
+    this.brushIcons = {};
     this.prevSteps = [];
     this.nextSteps = [];
 
@@ -138,6 +142,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
     this.createTabs();
     this.createDoneBtn();
+    this.getBrushIcons();
 
     // preview
     this.preview = document.createElement('div');
@@ -325,7 +330,6 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
         // start moving
         const layer = this.state.layers[selectedLayerId] as TextLayer;
-        layer.isMoved = false;
         this.movement.startMoving(event, this.state, selectedLayerId, () => {
           if(!layer.isMoved) {
             // start editor without moving
@@ -363,7 +367,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
             color: layer.color,
             size: layer.size
           };
-          showImageBrushes(this.settings, this.state, this.reRenderCanvas, this.updateHistory);
+          showImageBrushes(this.settings, this.state, this.brushIcons, this.reRenderCanvas, this.updateHistory);
           this.reRenderCanvas();
           return;
         }
@@ -595,25 +599,37 @@ export default class AppImageEditorTab extends SliderSuperTab {
     }
   }
 
-  private closeEditor(files: File[]) {
-    this.preview.classList.remove('image-editor-preview-showed');
-
-    this.cropper?.removeHandlers();
-    this.movement?.removeHandlers();
-
-    this.canvas.removeEventListener('mousedown', this.selectCanvasLayer, false);
-    this.canvas.removeEventListener('touchstart', this.selectCanvasLayer, false);
-
-    this.endEditText();
-
-    setTimeout(() => {
-      this.preview.remove();
-      PopupElement.createPopup(PopupNewMedia, appImManager.chat, files, 'media');
-    }, OPEN_NEW_MEDIA_POPOUT_DELAY);
-  }
-
   private changePreview(type: PreviewTypes) {
     this.preview.replaceChildren(type === PreviewTypes.crop ? this.cropPreview : this.canvas);
+  }
+
+  private createTabs() {
+    const tabsContainer = document.createElement('div');
+    tabsContainer.classList.add('search-super-tabs-container', 'tabs-container');
+
+    const tabs = document.createElement('nav');
+    tabs.classList.add('menu-horizontal-div');
+
+    tabsContainer.append(tabs);
+    this.content.append(tabsContainer);
+
+    TABS.forEach((tab) => {
+      const menuTab = document.createElement('div');
+      menuTab.classList.add('menu-horizontal-div-item');
+
+      const span = document.createElement('span');
+      span.classList.add('menu-horizontal-div-item-span');
+      const i = document.createElement('i');
+      span.append(ButtonIcon(`${tab.icon}`, {noRipple: true}));
+      span.append(i);
+      menuTab.append(span);
+      ripple(menuTab);
+
+      tabs.append(menuTab);
+    })
+
+    this.selectedTab = horizontalMenu(tabs, tabsContainer, (id) => this.onSelectTab(id));
+    this.selectedTab(TabTypes.filters);
   }
 
   private onSelectTab(id: number, force = false) {
@@ -674,7 +690,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
         break;
       case TabTypes.brush:
         window.addEventListener('keydown', this.keydown);
-        showImageBrushes(this.settings, this.state, this.reRenderCanvas, this.updateHistory);
+        showImageBrushes(this.settings, this.state, this.brushIcons, this.reRenderCanvas, this.updateHistory);
         break;
       case TabTypes.stickers:
         window.addEventListener('keydown', this.keydown);
@@ -685,33 +701,21 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.prevTabId = id;
   }
 
-  private createTabs() {
-    const tabsContainer = document.createElement('div');
-    tabsContainer.classList.add('search-super-tabs-container', 'tabs-container');
+  private closeEditor(files: File[]) {
+    this.preview.classList.remove('image-editor-preview-showed');
 
-    const tabs = document.createElement('nav');
-    tabs.classList.add('menu-horizontal-div');
+    this.cropper?.removeHandlers();
+    this.movement?.removeHandlers();
 
-    tabsContainer.append(tabs);
-    this.content.append(tabsContainer);
+    this.canvas.removeEventListener('mousedown', this.selectCanvasLayer, false);
+    this.canvas.removeEventListener('touchstart', this.selectCanvasLayer, false);
 
-    TABS.forEach((tab) => {
-      const menuTab = document.createElement('div');
-      menuTab.classList.add('menu-horizontal-div-item');
+    this.endEditText();
 
-      const span = document.createElement('span');
-      span.classList.add('menu-horizontal-div-item-span');
-      const i = document.createElement('i');
-      span.append(ButtonIcon(`${tab.icon}`, {noRipple: true}));
-      span.append(i);
-      menuTab.append(span);
-      ripple(menuTab);
-
-      tabs.append(menuTab);
-    })
-
-    this.selectedTab = horizontalMenu(tabs, tabsContainer, (id) => this.onSelectTab(id));
-    this.selectedTab(TabTypes.filters);
+    setTimeout(() => {
+      this.preview.remove();
+      PopupElement.createPopup(PopupNewMedia, appImManager.chat, files, 'media');
+    }, OPEN_NEW_MEDIA_POPOUT_DELAY);
   }
 
   private createDoneBtn() {
@@ -738,5 +742,23 @@ export default class AppImageEditorTab extends SliderSuperTab {
         this.close();
       }, this.initFile.type, 1);
     });
+  }
+
+  private getBrushIcons() {
+    for(const {style, iconUrl, defaultColor} of BRUSHES) {
+      fetch(iconUrl)
+      .then((res) => res.text())
+      .then((text) => {
+        if(defaultColor) {
+          text = replaceBrushColorOnText(text, defaultColor);
+        }
+
+        this.brushIcons[style] = {text, color: defaultColor};
+        return textToSvgURL(text);
+      })
+      .then((url) => {
+        this.brushIcons[style].url = url;
+      });
+    }
   }
 }

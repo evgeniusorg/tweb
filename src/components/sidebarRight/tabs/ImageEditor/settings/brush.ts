@@ -6,15 +6,35 @@ import {
   SIZE_RANGE_BRUSH_MIN,
   SIZE_RANGE_UPDATE_HISTORY_DELAY
 } from '../constants';
-import {BrushLayer, State} from '../types';
-import {getColorsList, getSizingRange} from './common';
+import {BrushIconsList, BrushLayer, State} from '../types';
+import {getColorsList, getSizingRange, selectColor, updateRangeSelectorColor} from './common';
 import {attachClickEvent} from '../../../../../helpers/dom/clickEvent';
 import findUpClassName from '../../../../../helpers/dom/findUpClassName';
 import {_i18n, LangPackKey} from '../../../../../lib/langPack';
 import renderImageFromUrl from '../../../../../helpers/dom/renderImageFromUrl';
+import textToSvgURL from '../../../../../helpers/textToSvgURL';
+
+export function replaceBrushColorOnText(text: string, color: string) {
+  return text.replace(/needReColor="true" (fill|stop-color)=".+?"/g, `needReColor="true" $1="${color}"`);
+}
+export function updateActiveBrushBtnColor(brushBtn: HTMLElement, color: string, brushIcons: BrushIconsList) {
+  const brushStyle = brushBtn.dataset.style;
+  const btnIcon = brushBtn.getElementsByClassName('image-editor-settings-list-btn-icon--brush')[0];
+  const btnIconImg = document.createElement('img');
+  const iconText = replaceBrushColorOnText(brushIcons[brushStyle  as BrushStyles].text, color);
+
+  brushIcons[brushStyle as BrushStyles].color = color;
+
+  textToSvgURL(iconText).then((icon) => {
+    renderImageFromUrl(btnIconImg, icon);
+    btnIcon.replaceChildren(btnIconImg);
+  })
+}
 
 function getBrushesList(
+  element: HTMLElement,
   state: State,
+  brushIcons: BrushIconsList,
   reRenderCanvas: () => void,
   updateHistory: () => void
 ) {
@@ -32,8 +52,20 @@ function getBrushesList(
     const btnIcon = document.createElement('div');
     btnIcon.classList.add('image-editor-settings-list-btn-icon--brush');
     const btnIconImg = document.createElement('img');
-    renderImageFromUrl(btnIconImg, iconUrl);
+
+    const icon = brushIcons[style].url;
+    renderImageFromUrl(btnIconImg, icon);
     btnIcon.append(btnIconImg);
+
+    if(state.brushSettings.style === style) {
+      btn.classList.add('active');
+      const iconText = replaceBrushColorOnText(brushIcons[style].text, state.brushSettings.color);
+      textToSvgURL(iconText).then((iconUrl) => {
+        brushIcons[style].url = iconUrl;
+        brushIcons[style].color = state.brushSettings.color;
+        renderImageFromUrl(btnIconImg, iconUrl);
+      });
+    }
 
     const btnText = document.createElement('div');
     _i18n(btnText, langKey as LangPackKey);
@@ -42,10 +74,6 @@ function getBrushesList(
     btn.append(btnText);
 
     btn.dataset.style = style;
-
-    if(state.brushSettings.style === style) {
-      btn.classList.add('active');
-    }
 
     brushesList.append(btn);
   });
@@ -61,11 +89,18 @@ function getBrushesList(
     activeBrushBtn && activeBrushBtn.classList.remove('active');
     brushBtn.classList.add('active');
 
+    const brushStyle = brushBtn.dataset.style as BrushStyles;
+    const brushColor = brushIcons[brushStyle].color;
+
     state.brushSettings.style = brushBtn.dataset.style as BrushStyles;
+    state.brushSettings.color = brushColor;
+    selectColor(element, brushColor);
+    updateRangeSelectorColor(element, brushColor);
 
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.brush) {
       const layer = state.layers[state.selectedLayerId] as BrushLayer;
-      layer.style = brushBtn.dataset.style as BrushStyles;
+      layer.style = brushStyle;
+      layer.color = brushColor;
       updateHistory();
       reRenderCanvas();
     }
@@ -77,12 +112,12 @@ function getBrushesList(
 export function showImageBrushes(
   element: HTMLElement,
   state: State,
+  brushIcons: BrushIconsList,
   reRenderCanvas: () => void,
   updateHistory: () => void
 ) {
   const brushSettings = document.createElement('div');
-
-  const selectColor = (color: Colors) => {
+  const selectColor = (color: string) => {
     state.brushSettings.color = color;
 
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.brush) {
@@ -91,6 +126,12 @@ export function showImageBrushes(
       updateHistory();
       reRenderCanvas();
     }
+
+    updateRangeSelectorColor(element, color);
+
+    const activeBrushBtn = element
+    .getElementsByClassName('image-editor-settings-list-btn active')[0] as HTMLElement;
+    updateActiveBrushBtnColor(activeBrushBtn, color, brushIcons);
   };
 
   const selectBrushSize = (size: number) => {
@@ -116,13 +157,14 @@ export function showImageBrushes(
     SIZE_RANGE_BRUSH_MAX,
     selectBrushSize
   ).container);
+  updateRangeSelectorColor(brushSettings, state.brushSettings.color);
 
   const title = document.createElement('div');
   title.classList.add('image-editor-settings-block-title');
   _i18n(title, 'ImageEditor.Brush.Title');
   brushSettings.append(title);
 
-  brushSettings.append(getBrushesList(state, reRenderCanvas, updateHistory));
+  brushSettings.append(getBrushesList(element, state, brushIcons, reRenderCanvas, updateHistory));
 
   element.replaceChildren(brushSettings);
 }

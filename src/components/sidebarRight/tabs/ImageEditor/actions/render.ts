@@ -303,13 +303,30 @@ export function renderBrushPath(canvas: HTMLCanvasElement, layer: BrushLayer, is
   context.save();
   context.beginPath();
 
-  layer.points.forEach((point, index) => {
-    if(index === 0) {
-      context.moveTo((layer.left + point[0]) * scaledRatio, (layer.top + point[1]) * scaledRatio);
-    } else {
-      context.lineTo((layer.left + point[0]) * scaledRatio, (layer.top + point[1]) * scaledRatio);
-    }
-  })
+  context.moveTo(
+    (layer.left + layer.points[0][0]) * scaledRatio,
+    (layer.top + layer.points[0][1]) * scaledRatio
+  );
+
+  for(let i = 0; i < layer.points.length - 1; i++) {
+    const x = (layer.left + (layer.points[i][0] + layer.points[i + 1][0]) / 2) * scaledRatio;
+    const y = (layer.top + (layer.points[i][1] + layer.points[i + 1][1]) / 2) * scaledRatio;
+    context.quadraticCurveTo(
+      (layer.left + layer.points[i][0]) * scaledRatio,
+      (layer.top + layer.points[i][1]) * scaledRatio,
+      x,
+      y
+    );
+  }
+
+  const lastPoint = layer.points[layer.points.length - 1];
+  context.quadraticCurveTo(
+    (layer.left + lastPoint[0]) * scaledRatio,
+    (layer.top + lastPoint[1]) * scaledRatio,
+    (layer.left + lastPoint[0]) * scaledRatio,
+    (layer.top + lastPoint[1]) * scaledRatio
+  );
+
 
   context.lineCap = 'round';
   context.lineWidth = layer.size * scaledRatio;
@@ -317,17 +334,17 @@ export function renderBrushPath(canvas: HTMLCanvasElement, layer: BrushLayer, is
   switch(layer.style) {
     case BrushStyles.neon: {
       context.shadowColor = layer.color;
-      context.shadowBlur = 5 * scaledRatio;
+      context.shadowBlur = layer.size * scaledRatio;
       context.strokeStyle = '#fff';
       break;
     }
     case BrushStyles.arrow: {
       context.strokeStyle = layer.color;
 
-      if(layer.isMoved || layer.points.length < 20) break;
+      if(layer.isDrawing || layer.points.length < 10) break;
 
       const lastPoint = layer.points[layer.points.length - 1];
-      const prevPoint = layer.points[layer.points.length - 20];
+      const prevPoint = layer.points[layer.points.length - 10];
 
       const lineLength = 3 * layer.size;
       const dx = lastPoint[0] - prevPoint[0];
@@ -350,6 +367,11 @@ export function renderBrushPath(canvas: HTMLCanvasElement, layer: BrushLayer, is
       break;
     }
     case BrushStyles.pen: {
+      context.strokeStyle = layer.color;
+      break;
+    }
+    case BrushStyles.brush: {
+      context.filter = 'opacity(0.7)';
       context.strokeStyle = layer.color;
       break;
     }

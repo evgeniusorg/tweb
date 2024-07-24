@@ -3,7 +3,19 @@ import {attachClickEvent} from '../../../../../helpers/dom/clickEvent';
 import findUpClassName from '../../../../../helpers/dom/findUpClassName';
 import {RangeSettingSelector} from '../../../../rangeSettingSelector';
 
-export function getColorsList(initColor: Colors, callback: (value: Colors) => void) {
+export function selectColor(element: HTMLElement, color: string) {
+  const colorBtns = element.getElementsByClassName('image-editor-colors-list-item');
+  for(let i = 0; i < colorBtns.length; i++) {
+    const colorBtn = colorBtns[i] as HTMLDivElement;
+    if(colorBtn.dataset.value === color) {
+      colorBtn.classList.add('active');
+    } else {
+      colorBtn.classList.remove('active');
+    }
+  }
+}
+
+export function getColorsList(initColor: string, callback: (value: string) => void) {
   const colorsList = document.createElement('div');
   colorsList.classList.add('image-editor-colors-list');
 
@@ -51,4 +63,9 @@ export function getSizingRange(initValue: number, minValue: number, maxValue: nu
   };
 
   return range;
+}
+
+export function updateRangeSelectorColor(element: HTMLElement, color: string) {
+  const rangeSelector = element.getElementsByClassName('progress-line__filled')[0] as HTMLDivElement;
+  rangeSelector?.style.setProperty('--color', color);
 }
