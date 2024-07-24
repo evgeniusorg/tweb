@@ -1,15 +1,19 @@
 import {
-  CANVAS_BORDER_CORNER_RADIUS, CANVAS_BORDER_PADDING,
-  CANVAS_FONT_FRAME_WHITE_PADDING, Colors,
+  BrushStyles,
+  CANVAS_BORDER_CORNER_RADIUS,
+  CANVAS_BORDER_PADDING,
+  CANVAS_FONT_FRAME_WHITE_PADDING,
+  CANVAS_FONT_LINE_HEIGHT_COEFFICIENT,
+  Colors,
   TextAlign,
   TextFrame
 } from '../constants';
-import {BrushLayer, State, TextLayer} from '../types';
+import {BrushLayer, State, StickerLayer, StickersList, TextLayer} from '../types';
 
 export function getTextBoundary(layer: TextLayer, context: CanvasRenderingContext2D) {
   const lines = layer.text.split('/n')
   let maxWidth = 0
-  const maxHeight = layer.size * lines.length * 1.2;
+  const maxHeight = layer.size * lines.length * CANVAS_FONT_LINE_HEIGHT_COEFFICIENT;
 
   context.save();
   context.font = `${layer.size}px ${layer.font}`;
@@ -217,7 +221,7 @@ export function renderText(canvas: HTMLCanvasElement, layer: TextLayer, isSelect
 
         context.roundRect(
           (layer.left - CANVAS_FONT_FRAME_WHITE_PADDING + getLeft(width)) * scaledRatio,
-          (layer.top - layer.size * 0.9 - CANVAS_FONT_FRAME_WHITE_PADDING + index * layer.size * 1.2) * scaledRatio,
+          (layer.top - layer.size * 0.9 - CANVAS_FONT_FRAME_WHITE_PADDING + index * layer.size * CANVAS_FONT_LINE_HEIGHT_COEFFICIENT) * scaledRatio,
           (width + 2 * CANVAS_FONT_FRAME_WHITE_PADDING) * scaledRatio,
           (height + 2 * CANVAS_FONT_FRAME_WHITE_PADDING) * scaledRatio,
           layer.size / 2 * scaledRatio
@@ -229,7 +233,7 @@ export function renderText(canvas: HTMLCanvasElement, layer: TextLayer, isSelect
         const color = layer.color === Colors.white ? '#000' : Colors.white;
         const {width} = getTextBoundary({...layer, text: line}, context);
         const left = layer.left + getLeft(width);
-        const top = layer.top + index * layer.size * 1.2;
+        const top = layer.top + index * layer.size * CANVAS_FONT_LINE_HEIGHT_COEFFICIENT;
 
         context.fillStyle = color;
         context.fillText(line, left * scaledRatio, top * scaledRatio);
@@ -246,7 +250,7 @@ export function renderText(canvas: HTMLCanvasElement, layer: TextLayer, isSelect
       lines.forEach((line, index) => {
         const {width} = getTextBoundary({...layer, text: line}, context);
         const left = layer.left + getLeft(width);
-        const top = layer.top + index * layer.size * 1.2;
+        const top = layer.top + index * layer.size * CANVAS_FONT_LINE_HEIGHT_COEFFICIENT;
 
         context.strokeStyle = '#000';
         context.lineWidth = 2 * scaledRatio;
@@ -266,7 +270,7 @@ export function renderText(canvas: HTMLCanvasElement, layer: TextLayer, isSelect
       lines.forEach((line, index) => {
         const {width} = getTextBoundary({...layer, text: line}, context);
         const left = layer.left + getLeft(width);
-        const top = layer.top + index * layer.size * 1.2;
+        const top = layer.top + index * layer.size * CANVAS_FONT_LINE_HEIGHT_COEFFICIENT;
 
         context.fillStyle = layer.color;
         context.fillText(line, left * scaledRatio, top * scaledRatio);
@@ -307,8 +311,50 @@ export function renderBrushPath(canvas: HTMLCanvasElement, layer: BrushLayer, is
     }
   })
 
-  context.strokeStyle = layer.color;
+  context.lineCap = 'round';
   context.lineWidth = layer.size * scaledRatio;
+
+  switch(layer.style) {
+    case BrushStyles.neon: {
+      context.shadowColor = layer.color;
+      context.shadowBlur = 5 * scaledRatio;
+      context.strokeStyle = '#fff';
+      break;
+    }
+    case BrushStyles.arrow: {
+      context.strokeStyle = layer.color;
+
+      if(layer.isMoved || layer.points.length < 20) break;
+
+      const lastPoint = layer.points[layer.points.length - 1];
+      const prevPoint = layer.points[layer.points.length - 20];
+
+      const lineLength = 3 * layer.size;
+      const dx = lastPoint[0] - prevPoint[0];
+      const dy = lastPoint[1] - prevPoint[1];
+      const angle = Math.atan2(dy, dx);
+
+      context.moveTo(
+        (layer.left + lastPoint[0] - lineLength * Math.cos(angle - Math.PI / 6)) * scaledRatio,
+        (layer.top + lastPoint[1] - lineLength * Math.sin(angle - Math.PI / 6)) * scaledRatio
+      );
+      context.lineTo(
+        (layer.left + lastPoint[0]) * scaledRatio,
+        (layer.top + lastPoint[1]) * scaledRatio
+      );
+      context.lineTo(
+        (layer.left + lastPoint[0] - lineLength * Math.cos(angle + Math.PI / 6)) * scaledRatio,
+        (layer.top + lastPoint[1] - lineLength * Math.sin(angle + Math.PI / 6)) * scaledRatio
+      );
+
+      break;
+    }
+    case BrushStyles.pen: {
+      context.strokeStyle = layer.color;
+      break;
+    }
+  }
+
   context.stroke();
   context.closePath();
   context.restore();
@@ -322,6 +368,32 @@ export function renderBrushPath(canvas: HTMLCanvasElement, layer: BrushLayer, is
       top - CANVAS_BORDER_PADDING,
       width + 2 * CANVAS_BORDER_PADDING,
       height + 2 * CANVAS_BORDER_PADDING
+    );
+  }
+}
+
+export function renderSticker(canvas: HTMLCanvasElement, layer: StickerLayer, stickers: StickersList, isSelected: boolean) {
+  const scaledRatio = canvas.width / canvas.offsetWidth;
+
+  const context = canvas.getContext('2d');
+  context.save();
+  const sticker = stickers[layer.data];
+
+  context.drawImage(sticker,
+    0, 0, sticker.width, sticker.height,
+    layer.left * scaledRatio, layer.top * scaledRatio,
+    layer.width * scaledRatio, layer.width * scaledRatio
+  );
+
+  context.restore();
+
+  if(isSelected) {
+    renderSelectedBorder(
+      canvas,
+      layer.left - CANVAS_BORDER_PADDING,
+      layer.top - CANVAS_BORDER_PADDING,
+      layer.width + 2 * CANVAS_BORDER_PADDING,
+      layer.height + 2 * CANVAS_BORDER_PADDING
     );
   }
 }
