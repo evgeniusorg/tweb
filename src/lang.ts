@@ -2870,7 +2870,15 @@ const lang = {
   'ImageEditor.Cropper.5:7': '5:7',
   'ImageEditor.Cropper.16:9': '16:9',
   'ImageEditor.Cropper.9:16': '9:16',
-  'ImageEditor.Text.Size': 'Size'
+  'ImageEditor.Text.Size': 'Size',
+  'ImageEditor.Brushes.Pen': 'Pen',
+  'ImageEditor.Brushes.Arrow': 'Arrow',
+  'ImageEditor.Brushes.Brush': 'Brush',
+  'ImageEditor.Brushes.Neon': 'Neon',
+  'ImageEditor.Brushes.Blur': 'Blur',
+  'ImageEditor.Brushes.Eraser': 'Eraser',
+  'ImageEditor.Brush.Title': 'Tool',
+  'ImageEditor.Font.Title': 'Font'
 };
 
 export default lang;
