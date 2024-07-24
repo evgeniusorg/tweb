@@ -7,7 +7,7 @@ import Icon from '../../../../icon';
 
 export function showImageCrop(element: HTMLElement, cropper: any, state: State) {
   const cropTitle = document.createElement('div');
-  cropTitle.classList.add('image-editor-cropper-format-title');
+  cropTitle.classList.add('image-editor-settings-block-title');
   _i18n(cropTitle, 'ImageEditor.Cropper.Title');
   element.replaceChildren(cropTitle);
 

@@ -1,4 +1,5 @@
 import {BrushDrawingEventState, BrushLayer} from '../types';
+import {getEventPosition} from './eventActions';
 
 function brushDrawing(canvas: HTMLCanvasElement, reRender: () => void) {
   const eventState: BrushDrawingEventState = {
@@ -15,14 +16,16 @@ function brushDrawing(canvas: HTMLCanvasElement, reRender: () => void) {
     canvas.removeEventListener('touchmove', moving);
   }
 
-  function startDrawing(e: MouseEvent | TouchEvent, layer: BrushLayer, endDrawingCallback: () => void) {
-    e.preventDefault();
-    e.stopPropagation();
+  function startDrawing(event: MouseEvent | TouchEvent, layer: BrushLayer, endDrawingCallback: () => void) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const {left, top} = getEventPosition(event, canvas);
 
     eventState.layer = layer;
     eventState.endDrawingCallback = endDrawingCallback;
-    eventState.mouseX = e.offsetX;
-    eventState.mouseY = e.offsetY;
+    eventState.mouseX = left;
+    eventState.mouseY = top;
 
     canvas.addEventListener('mousemove', moving);
     canvas.addEventListener('touchmove', moving);
@@ -30,8 +33,8 @@ function brushDrawing(canvas: HTMLCanvasElement, reRender: () => void) {
     canvas.addEventListener('touchend', endDrawing);
   }
 
-  function endDrawing(e: MouseEvent | TouchEvent) {
-    e.preventDefault();
+  function endDrawing(event: MouseEvent | TouchEvent) {
+    event.preventDefault();
     canvas.removeEventListener('mouseup', endDrawing);
     canvas.removeEventListener('touchend', endDrawing);
     canvas.removeEventListener('mousemove', moving);
@@ -39,11 +42,13 @@ function brushDrawing(canvas: HTMLCanvasElement, reRender: () => void) {
     eventState.endDrawingCallback?.();
   }
 
-  function moving(e: any) {
-    e.preventDefault();
-    e.stopPropagation();
+  function moving(event: MouseEvent | TouchEvent) {
+    event.preventDefault();
+    event.stopPropagation();
 
-    eventState.layer.points.push([e.offsetX - eventState.mouseX, e.offsetY - eventState.mouseY]);
+    const {left, top} = getEventPosition(event, canvas);
+    eventState.layer.isMoved = true;
+    eventState.layer.points.push([left - eventState.mouseX, top - eventState.mouseY]);
     reRender();
   }
 

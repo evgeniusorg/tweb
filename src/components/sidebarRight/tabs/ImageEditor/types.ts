@@ -67,7 +67,7 @@ export type Filter = {
 }
 
 export type TextLayer = {
-  type: LayerTypes;
+  type: LayerTypes.text;
   text: string;
   color: Colors;
   font: string;
@@ -86,7 +86,7 @@ export type TextLayer = {
 export type Point = [number, number];
 
 export type BrushLayer = {
-  type: LayerTypes;
+  type: LayerTypes.brush;
   points: Point[];
   color: Colors;
   size: number;
@@ -98,7 +98,18 @@ export type BrushLayer = {
   isMoved?: boolean;
 }
 
-export type Layer = TextLayer | BrushLayer;
+export type StickerLayer = {
+  type: LayerTypes.sticker;
+  data: string;
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  isMoved?: boolean;
+  size: 0;
+}
+
+export type Layer = TextLayer | BrushLayer | StickerLayer;
 
 export type CropperEventState = {
   mouseX: number,
@@ -127,3 +138,5 @@ export type BrushDrawingEventState = {
   mouseX: number,
   mouseY: number,
 }
+
+export type StickersList = Record<string, any>;

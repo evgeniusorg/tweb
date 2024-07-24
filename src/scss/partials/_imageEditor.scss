@@ -52,13 +52,77 @@
 
   &-settings {
     position: absolute;
-    padding: 56px 0 64px;
+    padding: 3rem 0 4rem;
     width: 100%;
+    min-height: 100%;
+
+    .range-setting-selector-name {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.25rem;
+      color: var(--secondary-text-color);
+    }
+
+    &-block-title {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.25rem;
+      color: var(--secondary-text-color);
+      padding: 1rem 0.875rem;
+    }
 
     &-filter {
       &--disabled {
         opacity: 0.4;
         pointer-events: none;
+      }
+    }
+
+    &-stickers {
+      padding: 1rem;
+      height: calc(100vh - 10rem);
+    }
+
+    &-list {
+      .btn-menu-item {
+        height: 3rem;
+
+        &.active {
+          background-color: var(--light-secondary-text-color);
+
+          .image-editor-settings-list-btn-icon--brush {
+            width: 120px;
+          }
+        }
+      }
+
+      &-btn {
+        &--disabled {
+          opacity: 0.4;
+          pointer-events: none !important;
+        }
+
+        &-icon {
+          &--brush {
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            margin-right: 1rem;
+            justify-content: flex-end;
+            width: 84px;
+            transition: width .2s 0s ease-out;
+
+            &:after {
+              content: '';
+              width: 16px;
+              height: 48px;
+              background: linear-gradient(270deg, rgba(33, 33, 33, 0) 0%, #212121 100%);
+              position: absolute;
+              left: 0;
+              top: -14px;
+            }
+          }
+        }
       }
     }
   }
@@ -188,14 +252,6 @@
   }
 
   &-cropper-format {
-    &-title {
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1.25rem;
-      color: var(--secondary-text-color);
-      padding: 1rem 0.875rem;
-    }
-
     &-list {
       padding: 0 0.1875rem;
 
@@ -282,16 +338,6 @@
 
     &-frames {
       display: flex;
-    }
-  }
-
-  &-fonts-list {
-    .btn-menu-item {
-      height: 3rem;
-
-      &.active {
-        background-color: var(--light-secondary-text-color);
-      }
     }
   }
 }

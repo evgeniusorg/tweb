@@ -14,6 +14,7 @@ import ButtonIcon from '../../../../buttonIcon';
 import {getTextBoundary} from '../actions/render';
 import {State, TextLayer} from '../types';
 import {getColorsList, getSizingRange} from './common';
+import {_i18n} from '../../../../../lib/langPack';
 
 function getFontStyles(state: State, reRenderCanvas: () => void, updateHistory: () => void) {
   const fontStyles = document.createElement('div');
@@ -95,11 +96,11 @@ function getFontsList(
   updateHistory: () => void
 ) {
   const fontsList = document.createElement('div');
-  fontsList.classList.add('image-editor-fonts-list');
+  fontsList.classList.add('image-editor-settings-list');
 
   FONTS.forEach(({font, title}) => {
     const btn = document.createElement('div');
-    btn.classList.add('btn-menu-item', 'rp-overflow', 'image-editor-fonts-list-btn');
+    btn.classList.add('btn-menu-item', 'rp-overflow', 'image-editor-settings-list-btn');
     btn.style.setProperty('font-family', font);
     btn.append(title);
     btn.dataset.font = font;
@@ -112,7 +113,7 @@ function getFontsList(
   });
 
   attachClickEvent(fontsList, (e) => {
-    const fontBtn = findUpClassName(e.target, 'image-editor-fonts-list-btn');
+    const fontBtn = findUpClassName(e.target, 'image-editor-settings-list-btn');
 
     if(!fontBtn) {
       return;
@@ -153,7 +154,8 @@ export function showImageText(
     state.textSettings.color = color;
 
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.text) {
-      state.layers[state.selectedLayerId].color = color;
+      const layer = state.layers[state.selectedLayerId] as TextLayer;
+      layer.color = color;
       updateHistory();
       reRenderCanvas();
     }
@@ -189,6 +191,12 @@ export function showImageText(
     SIZE_RANGE_FONT_MAX,
     selectFontSize
   ).container);
+
+  const title = document.createElement('div');
+  title.classList.add('image-editor-settings-block-title');
+  _i18n(title, 'ImageEditor.Font.Title');
+  textSettings.append(title);
+
   textSettings.append(getFontsList(state, canvas, reRenderCanvas, updateHistory));
 
   element.replaceChildren(textSettings);

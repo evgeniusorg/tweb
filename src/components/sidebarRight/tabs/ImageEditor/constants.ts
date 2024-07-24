@@ -3,15 +3,15 @@ import {CropperFormat, Filter, Tab} from './types';
 export enum PreviewTypes {
   crop = 'crop',
   canvas = 'canvas'
-}
+};
 
 export enum TabTypes {
   filters,
   crop,
   text,
   brush,
-  emoji
-}
+  stickers
+};
 
 export const TABS: Tab[] = [{
   type: TabTypes.filters,
@@ -26,7 +26,7 @@ export const TABS: Tab[] = [{
   type: TabTypes.brush,
   icon: 'icon_brush'
 }, {
-  type: TabTypes.emoji,
+  type: TabTypes.stickers,
   icon: 'icon_smile'
 }];
 
@@ -42,7 +42,7 @@ export enum FilterTypes {
   vignette = 'vignette',
   grain = 'grain',
   sharpen = 'sharpen'
-}
+};
 
 export const FILTERS: Filter[] = [{
   type: FilterTypes.enhance,
@@ -119,7 +119,7 @@ export enum CropperFormatTypes {
   '5:7' = '5:7',
   '16:9' = '16:9',
   '9:16' = '9:16'
-}
+};
 
 export const CROPPER_DEFAULT_FORMATS: CropperFormat[] = [{
   type: CropperFormatTypes.free,
@@ -250,7 +250,7 @@ export enum TextFrame {
   regular = 'regular',
   black = 'black',
   white = 'white',
-}
+};
 
 export enum BrushStyles {
   pen = 'pen',
@@ -259,20 +259,48 @@ export enum BrushStyles {
   neon = 'neon',
   blur = 'blur',
   eraser = 'eraser'
-}
+};
+
+export const BRUSHES = [{
+  style: BrushStyles.pen,
+  langKey: 'ImageEditor.Brushes.Pen',
+  iconUrl: 'assets/img/brushes/Pen.svg'
+}, {
+  style: BrushStyles.arrow,
+  langKey: 'ImageEditor.Brushes.Arrow',
+  iconUrl: 'assets/img/brushes/Arrow.svg'
+}, {
+  style: BrushStyles.brush,
+  langKey: 'ImageEditor.Brushes.Brush',
+  iconUrl: 'assets/img/brushes/Brush.svg',
+  disabled: true
+}, {
+  style: BrushStyles.neon,
+  langKey: 'ImageEditor.Brushes.Neon',
+  iconUrl: 'assets/img/brushes/Neon.svg'
+}, {
+  style: BrushStyles.blur,
+  langKey: 'ImageEditor.Brushes.Blur',
+  iconUrl: 'assets/img/brushes/Blur.svg',
+  disabled: true
+}, {
+  style: BrushStyles.eraser,
+  langKey: 'ImageEditor.Brushes.Eraser',
+  iconUrl: 'assets/img/brushes/Eraser.svg',
+  disabled: true
+}];
 
 export enum LayerTypes {
   text = 'text',
   brush = 'brush',
-}
+  sticker = 'sticker'
+};
 
 export const CANVAS_BORDER_PADDING = 16;
 export const CANVAS_BORDER_CORNER_RADIUS = 8;
 export const CANVAS_FONT_FRAME_WHITE_PADDING = 8;
-
 export const CANVAS_FONT_SIZE_DEFAULT = 24;
-
-export const CANVAS_FONT_LINE_COEFFICIENT = 1.2;
+export const CANVAS_FONT_LINE_HEIGHT_COEFFICIENT = 1.2;
 export const CANVAS_BRUSH_SIZE_DEFAULT = 8;
 
 export const SIZE_RANGE_FONT_MIN = 16;
@@ -280,5 +308,7 @@ export const SIZE_RANGE_FONT_MAX = 96;
 export const SIZE_RANGE_STEP = 1;
 export const SIZE_RANGE_BRUSH_MIN = 1;
 export const SIZE_RANGE_BRUSH_MAX = 60;
-
 export const SIZE_RANGE_UPDATE_HISTORY_DELAY = 500;
+
+export const CURSOR_ANIMATION_DELAY = 400;
+export const OPEN_NEW_MEDIA_POPOUT_DELAY = 300;
