@@ -16,13 +16,17 @@ import {
   CANVAS_BORDER_PADDING,
   CANVAS_BRUSH_SIZE_DEFAULT,
   CANVAS_FONT_SIZE_DEFAULT,
+  CANVAS_LAYER_SIZE_COEFFICIENT,
   Colors,
   CropperFormatTypes,
   CURSOR_ANIMATION_DELAY,
+  DEFAULT_STICKER_SIZE,
   FONTS,
   LayerTypes,
+  OPEN_IMAGE_EDITOR_PREVIEW_DELAY,
   OPEN_NEW_MEDIA_POPOUT_DELAY,
   PreviewTypes,
+  RESIZE_WINDOW_SMALL_SIZE_WIDTH,
   TABS,
   TabTypes,
   TextAlign,
@@ -84,6 +88,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
   ) {
     this.container.id = 'image-editor-sidebar';
     this.container.classList.add('image-editor-sidebar');
+    this.scrollable.container.classList.add('image-editor-sidebar-scrollable');
 
     this.fileIndex = fileIndex;
     this.allFiles = [...allFiles];
@@ -124,7 +129,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
     // settings
     this.settings = document.createElement('div');
-    this.settings.classList.add('image-editor-settings');
+    this.settings.classList.add('image-editor-sidebr-settings');
     this.scrollable.append(this.settings);
 
     // clone of selected file
@@ -136,9 +141,9 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.reRenderCanvas = this.reRenderCanvas.bind(this);
     this.onSelectTab = this.onSelectTab.bind(this);
     this.updateHistory = this.updateHistory.bind(this);
-    this.updateCropperHistory = this.updateCropperHistory.bind(this);
     this.cursorAnimation = this.cursorAnimation.bind(this);
     this.addSticker = this.addSticker.bind(this);
+    this.resizeWindow = this.resizeWindow.bind(this);
 
     this.createTabs();
     this.createDoneBtn();
@@ -147,10 +152,12 @@ export default class AppImageEditorTab extends SliderSuperTab {
     // preview
     this.preview = document.createElement('div');
     this.preview.classList.add('image-editor-preview');
-    setTimeout(() => this.preview.classList.add('image-editor-preview-showed'), 100);
+    setTimeout(() => this.preview.classList.add('image-editor-preview-showed'), OPEN_IMAGE_EDITOR_PREVIEW_DELAY);
 
     const sidebar =  document.getElementById('column-right');
     document.getElementById('main-columns').insertBefore(this.preview, sidebar);
+    window.addEventListener('resize', this.resizeWindow);
+    this.resizeWindow();
 
     // canvas
     this.canvas = document.createElement('canvas');
@@ -261,8 +268,8 @@ export default class AppImageEditorTab extends SliderSuperTab {
         ) continue;
 
         if(
-          top < layer.top - layer.size * 0.9 - CANVAS_BORDER_PADDING ||
-          top > layer.top - layer.size * 0.9 + layer.height + CANVAS_BORDER_PADDING
+          top < layer.top - layer.size * CANVAS_LAYER_SIZE_COEFFICIENT - CANVAS_BORDER_PADDING ||
+          top > layer.top - layer.size * CANVAS_LAYER_SIZE_COEFFICIENT + layer.height + CANVAS_BORDER_PADDING
         ) continue;
 
         selectedLayerId = i;
@@ -517,7 +524,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
   private addSticker(event: {target: Element | EventTarget}) {
     const createSticker = (image: HTMLImageElement, docId: string)=> {
       const aspectRatio = image.width / image.height;
-      const width = 100;
+      const width = DEFAULT_STICKER_SIZE;
       const height = width / aspectRatio;
 
       this.stickers[docId] = image;
@@ -559,14 +566,6 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.redoBtn.setAttribute('disabled', 'true');
   }
 
-  private updateCropperHistory() {
-    this.state.cropper = {
-      ...this.state.cropper,
-      ...this.cropper.getParams()
-    };
-    this.updateHistory();
-  }
-
   private undo() {
     if(this.prevSteps.length < 2) return;
 
@@ -605,7 +604,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
   private createTabs() {
     const tabsContainer = document.createElement('div');
-    tabsContainer.classList.add('search-super-tabs-container', 'tabs-container');
+    tabsContainer.classList.add('search-super-tabs-container', 'tabs-container', 'image-editor-settings-tabs');
 
     const tabs = document.createElement('nav');
     tabs.classList.add('menu-horizontal-div');
@@ -653,6 +652,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
         ...this.state.cropper,
         ...this.cropper.getParams()
       };
+      this.updateHistory();
       this.cropper.removeHandlers();
       this.reRenderCanvas();
     }
@@ -681,7 +681,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
         }
 
         this.cropPreview.append(this.image);
-        this.cropper = imageCropper(this.image, this.state.cropper, this.updateCropperHistory);
+        this.cropper = imageCropper(this.image, this.state.cropper);
         showImageCrop(this.settings, this.cropper, this.state);
         break;
       case TabTypes.text:
@@ -709,6 +709,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
     this.canvas.removeEventListener('mousedown', this.selectCanvasLayer, false);
     this.canvas.removeEventListener('touchstart', this.selectCanvasLayer, false);
+    window.removeEventListener('resize', this.resizeWindow);
 
     this.endEditText();
 
@@ -759,6 +760,28 @@ export default class AppImageEditorTab extends SliderSuperTab {
       .then((url) => {
         this.brushIcons[style].url = url;
       });
+    }
+  }
+
+  private resizeWindow() {
+    const width = window.innerWidth;
+    const tabsContainer = this.content.getElementsByClassName('image-editor-settings-tabs')[0];
+
+    if(width < RESIZE_WINDOW_SMALL_SIZE_WIDTH &&
+      this.preview.parentElement === document.getElementById('main-columns')
+    ) {
+      this.preview.remove();
+      tabsContainer.prepend(this.preview);
+      this.container.classList.add('image-editor-sidebar--small');
+      return;
+    }
+
+    if(width >= RESIZE_WINDOW_SMALL_SIZE_WIDTH && this.preview.parentElement === tabsContainer) {
+      this.preview.remove();
+      const sidebar =  document.getElementById('column-right');
+      document.getElementById('main-columns').insertBefore(this.preview, sidebar);
+      this.container.classList.remove('image-editor-sidebar--small');
+      return;
     }
   }
 }

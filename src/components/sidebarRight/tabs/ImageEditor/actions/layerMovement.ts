@@ -48,8 +48,8 @@ function layerMovement(canvas: HTMLCanvasElement, reRender: () => void) {
     canvas.removeEventListener('mousemove', moving);
     canvas.removeEventListener('touchmove', moving);
 
-    eventState.layer.isMoved = false;
     eventState.endMovingCallback?.();
+    eventState.layer.isMoved = false;
   }
 
   function moving(event: MouseEvent | TouchEvent) {

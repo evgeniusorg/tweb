@@ -7,7 +7,7 @@ import {
   resizeTopRigthCorner
 } from './cropperResize';
 
-function imageCropper(originalImage: HTMLImageElement, initParams: Cropper, updateCropperHistory: () => void) {
+function imageCropper(originalImage: HTMLImageElement, initParams: Cropper) {
   let cropComponent: HTMLDivElement,
     container: HTMLDivElement,
     cropImage: HTMLImageElement,
@@ -46,6 +46,7 @@ function imageCropper(originalImage: HTMLImageElement, initParams: Cropper, upda
     document.removeEventListener('touchend', endMoving);
     document.removeEventListener('mousemove', moving);
     document.removeEventListener('touchmove', moving);
+    window.removeEventListener('resize', resizeWindow);
 
     cropComponent.remove();
   }
@@ -53,6 +54,7 @@ function imageCropper(originalImage: HTMLImageElement, initParams: Cropper, upda
   function addHandlers() {
     cropComponent.addEventListener('mousedown', startMoving, false);
     cropComponent.addEventListener('touchstart', startMoving, false);
+    window.addEventListener('resize', resizeWindow);
   }
 
   function init() {
@@ -149,23 +151,29 @@ function imageCropper(originalImage: HTMLImageElement, initParams: Cropper, upda
   }
 
   // Save the initial event details and container state
-  function saveEventState(e: any) {
+  function saveEventState(event: MouseEvent | TouchEvent) {
     eventState.containerWidth = container.offsetWidth;
     eventState.containerHeight = container.offsetHeight;
 
     eventState.containerLeft = container.offsetLeft;
     eventState.containerTop = container.offsetTop;
 
-    eventState.mouseX = (e.clientX || e.pageX || e.touches && e.touches[0].clientX) + window.scrollX;
-    eventState.mouseY = (e.clientY || e.pageY || e.touches && e.touches[0].clientY) + window.scrollY;
-    eventState.target = e.target;
+    eventState.mouseX = (event instanceof MouseEvent ?
+      (event.clientX || event.pageX) :
+      (event.touches && event.touches[0].clientX)
+    ) + window.scrollX;
+    eventState.mouseY = (event instanceof MouseEvent ?
+      (event.clientY || event.pageY) :
+      (event.touches && event.touches[0].clientY)
+    ) + window.scrollY;
+    eventState.target = event.target as HTMLElement;
   }
 
-  function startMoving(e: MouseEvent | TouchEvent) {
-    e.preventDefault();
-    e.stopPropagation();
+  function startMoving(event: MouseEvent | TouchEvent) {
+    event.preventDefault();
+    event.stopPropagation();
 
-    saveEventState(e);
+    saveEventState(event);
 
     document.addEventListener('mousemove', moving);
     document.addEventListener('touchmove', moving);
@@ -173,8 +181,8 @@ function imageCropper(originalImage: HTMLImageElement, initParams: Cropper, upda
     document.addEventListener('touchend', endMoving);
   }
 
-  function endMoving(e: MouseEvent | TouchEvent) {
-    e.preventDefault();
+  function endMoving(event: MouseEvent | TouchEvent) {
+    event.preventDefault();
 
     eventState.target = null;
 
@@ -182,16 +190,14 @@ function imageCropper(originalImage: HTMLImageElement, initParams: Cropper, upda
     document.removeEventListener('touchend', endMoving);
     document.removeEventListener('mousemove', moving);
     document.removeEventListener('touchmove', moving);
-
-    updateCropperHistory();
   }
 
-  function resizing(e: any) {
-    e.preventDefault();
-    e.stopPropagation();
+  function resizing(event: MouseEvent | TouchEvent) {
+    event.preventDefault();
+    event.stopPropagation();
 
-    const currentTouchX = e.pageX || e.touches && e.touches[0].pageX;
-    const currentTouchY = e.pageY || e.touches && e.touches[0].pageY;
+    const currentTouchX = event instanceof MouseEvent ? event.pageX : (event.touches && event.touches[0].pageX);
+    const currentTouchY = event instanceof MouseEvent ? event.pageY : (event.touches && event.touches[0].pageY);
 
     const dx = currentTouchX - eventState.mouseX;
     const dy = currentTouchY - eventState.mouseY;
@@ -214,17 +220,17 @@ function imageCropper(originalImage: HTMLImageElement, initParams: Cropper, upda
     updateCorners(width, height, left, top);
   }
 
-  function moving(e: any) {
+  function moving(event: MouseEvent | TouchEvent) {
     if([cornerTopLeft, cornerBottomLeft, cornerTopRight, cornerBottomRight].includes(eventState.target)) {
-      resizing(e);
+      resizing(event);
       return;
     }
 
-    e.preventDefault();
-    e.stopPropagation();
+    event.preventDefault();
+    event.stopPropagation();
 
-    const currentTouchX = e.pageX || e.touches && e.touches[0].pageX;
-    const currentTouchY = e.pageY || e.touches && e.touches[0].pageY;
+    const currentTouchX = event instanceof MouseEvent ? event.pageX : (event.touches && event.touches[0].pageX);
+    const currentTouchY = event instanceof MouseEvent ? event.pageY : (event.touches && event.touches[0].pageY);
 
     let left = currentTouchX - (eventState.mouseX - eventState.containerLeft);
     let top = currentTouchY - (eventState.mouseY - eventState.containerTop);
@@ -237,6 +243,26 @@ function imageCropper(originalImage: HTMLImageElement, initParams: Cropper, upda
     if(top < 0) top = 0;
     else if(top > cropImage.offsetHeight - height) top = cropImage.offsetHeight - height;
 
+    updateCropImage(left, top);
+    updateContainer(left, top);
+    updateCorners(width, height, left, top);
+  }
+
+  function resizeWindow() {
+    const initImageWidth = originalImage.naturalWidth / scaledRatio;
+    const widthScaledRatio = originalImage.width / initImageWidth;
+    const width = cropWidth * widthScaledRatio / scaledRatio;
+    const left = cropLeft * widthScaledRatio / scaledRatio;
+
+    const initImageHeight = originalImage.naturalHeight / scaledRatio;
+    const heightScaledRatio = originalImage.height / initImageHeight;
+    const height = cropHeight * heightScaledRatio / scaledRatio;
+    const top = cropTop  * heightScaledRatio / scaledRatio;
+
+    scaledRatio = originalImage.naturalWidth / originalImage.width;
+    cropImage.style.maxWidth = originalImage.width + 'px';
+
+    updateCropSize(width, height);
     updateCropImage(left, top);
     updateContainer(left, top);
     updateCorners(width, height, left, top);

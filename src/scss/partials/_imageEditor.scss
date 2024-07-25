@@ -15,127 +15,24 @@
 
     &-showed {
       transform: translate3d(0, 0, 0);
-    }
-  }
 
-  &-sidebar {
-    .menu-horizontal-div {
-      background: var(--background-color);;
-
-      i {
-        bottom: 0;
-      }
-
-      &-item {
-        border-radius: 0 !important;
-        padding: 0;
-
-        .btn-icon {
-          font-size: 24px;
-          padding: 12px;
-        }
-
-        &.active {
-          .btn-icon {
-            color: var(--primary-color);
-          }
+      @include respond-to(no-floating-left-sidebar) {
+        body.is-right-column-shown & {
+          transform: translate3d(0, 0, 0);
         }
       }
     }
-  }
 
-  &-header {
-    &-btns {
-      display: flex;
+    @include respond-to(not-handhelds) {
+      transform: translate3d(calc((100% + var(--right-column-width)) * var(--reflect)), 0, 0);
     }
-  }
-
-  &-settings {
-    position: absolute;
-    padding: 3rem 0 4rem;
-    width: 100%;
-    min-height: 100%;
-
-    .range-setting-selector-name {
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1.25rem;
-      color: var(--secondary-text-color);
-    }
-
-    &-block-title {
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1.25rem;
-      color: var(--secondary-text-color);
-      padding: 1rem 0.875rem;
-    }
-
-    &-filter {
-      &--disabled {
-        opacity: 0.4;
-        pointer-events: none;
-      }
-    }
-
-    &-stickers {
-      padding: 1rem;
-      height: calc(100vh - 10rem);
-    }
-
-    &-list {
-      .btn-menu-item {
-        height: 3rem;
-
-        &.active {
-          background-color: var(--light-secondary-text-color);
-
-          .image-editor-settings-list-btn-icon--brush {
-            width: 120px;
-          }
-        }
-      }
-
-      &-btn {
-        &--disabled {
-          opacity: 0.4;
-          pointer-events: none !important;
-        }
-
-        &-icon {
-          &--brush {
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            margin-right: 1rem;
-            justify-content: flex-end;
-            width: 84px;
-            transition: width .2s 0s ease-out;
-
-            &:after {
-              content: '';
-              width: 16px;
-              height: 48px;
-              background: linear-gradient(270deg, rgba(33, 33, 33, 0) 0%, #212121 100%);
-              position: absolute;
-              left: 0;
-              top: -14px;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  &-canvas {
-    max-width: 100%;
-    max-height: 100%;
   }
 
   &-crop-preview {
-    margin: 40px;
+    padding: 40px;
     max-width: 100%;
     max-height: 100%;
+    box-sizing: border-box;
 
     .overlay::selection,
     &-component::selection {
@@ -146,15 +43,11 @@
     &-overlay-image {
       width: auto;
       height: auto;
-      /* можно явно указать либо ширину, либо высоту */
-      /* width: 500px; */
-      /*либо height: 300px;*/
       display: block;
       object-fit: contain;
       object-position: center;
     }
 
-    /*add stretch*/
     &-image {
       display: block;
       position: relative;
@@ -168,6 +61,7 @@
 
       > img {
         max-width: 100%;
+        max-height: calc(100vh - 80px);
         display: block;
       }
     }
@@ -249,6 +143,144 @@
     &.is-forum &-overlay {
       border-radius: var(--avatar-border-radius-forum);
     }
+  }
+
+  &-sidebar {
+    &--small {
+      .image-editor-preview {
+        transform: none!important;
+        position: relative;
+        width: 100%;
+        max-height: 60%;
+        height: 60%;
+      }
+
+      .image-editor-sidebar-scrollable {
+        height: 40%;
+        top: 60%;
+      }
+
+      .image-editor-crop-preview-component > img {
+        max-height: calc(60vh - 120px);
+      }
+    }
+
+    .menu-horizontal-div {
+      background: var(--background-color);;
+
+      i {
+        bottom: 0;
+      }
+
+      &-item {
+        border-radius: 0 !important;
+        padding: 0;
+
+        .btn-icon {
+          font-size: 24px;
+          padding: 12px;
+        }
+
+        &.active {
+          .btn-icon {
+            color: var(--primary-color);
+          }
+        }
+      }
+    }
+  }
+
+  &-header {
+    &-btns {
+      display: flex;
+    }
+  }
+
+  &-settings {
+    position: absolute;
+    padding: 3rem 0 4rem;
+    width: 100%;
+    min-height: 100%;
+
+    &-tabs {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .range-setting-selector-name {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.25rem;
+      color: var(--secondary-text-color);
+    }
+
+    &-block-title {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.25rem;
+      color: var(--secondary-text-color);
+      padding: 1rem 0.875rem;
+    }
+
+    &-filter {
+      &--disabled {
+        opacity: 0.4;
+        pointer-events: none;
+      }
+    }
+
+    &-stickers {
+      padding: 1rem;
+      height: calc(100vh - 10rem);
+    }
+
+    &-list {
+      .btn-menu-item {
+        height: 3rem;
+
+        &.active {
+          background-color: var(--light-secondary-text-color);
+
+          .image-editor-settings-list-btn-icon--brush {
+            width: 120px;
+          }
+        }
+      }
+
+      &-btn {
+        &--disabled {
+          opacity: 0.4;
+          pointer-events: none !important;
+        }
+
+        &-icon {
+          &--brush {
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            margin-right: 1rem;
+            justify-content: flex-end;
+            width: 84px;
+            transition: width .2s 0s ease-out;
+
+            &:after {
+              content: '';
+              width: 16px;
+              height: 48px;
+              background: linear-gradient(270deg, rgba(33, 33, 33, 0) 0%, #212121 100%);
+              position: absolute;
+              left: 0;
+              top: -14px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &-canvas {
+    max-width: 100%;
+    max-height: 100%;
   }
 
   &-cropper-format {

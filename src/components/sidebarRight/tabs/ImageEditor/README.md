@@ -16,6 +16,8 @@
 4. Added right sidebar for image editor.
 5. Added preview of image for image editor.
 6. Added cropper of image.
+   1. All cropper formats;
+   2. History of changes.
 7. Added 3 filters for image (brightness, contrast, saturation).
 8. Added text layers:
    1. Text can have several lines (pres 'Shift' + 'Enter');
@@ -23,25 +25,29 @@
    3. Added animated cursor;
    4. Selected layer can be changed (edit, text size, align, frame, color, font);
    5. Selected layer can be moved;
-   6. Selected layer can be removed (press 'del', 'backspace').
+   6. Selected layer can be removed (press 'del', 'backspace'),
+   7. History of changes.
 9. Added drawing by brushes (except eraser):
    1. Each brush layer can be selected;
    2. Selected layer can be changed (size, color, brush type);
    3. Selected layer can be moved;
    4. Selected layer can be removed (press 'del', 'backspace');
-   5. Each brush image changes color after selection of new color.
+   5. Each brush image changes color after selection of new color,
+   6. History of changes.
 10. Added selector of stickers:
     1. Each sticker layer can be selected;
     2. Selected layer can be moved;
-    3. Selected layer can be removed (press 'del', 'backspace').
+    3. Selected layer can be removed (press 'del', 'backspace'),
+    4. History of changes.
+11. Resizing window:
+    1. Resizing cropper area;
+    2. Mo
 
 ## TODO
 1. Add all image filters.
-2. Add rotation and flip of image on cropper tab.
-3. Add history of changes on cropper tab.
-4. Add rotation for layers. 
-5. Add all brushes. 
-6. Add selector of custom color for text and brush. 
-7. Refactoring of color frame for text layer. 
-8. Resizing window 
-9. Refactoring of StickersTab class (remove emoticonsDropdown)
+2. Add rotation and flip of image on cropper tab. 
+3. Add rotation for layers. 
+4. Add all brushes. 
+5. Add selector of custom color for text and brush. 
+6. Refactoring of color frame for text layer. 
+7. Refactoring of StickersTab class (remove emoticonsDropdown)
