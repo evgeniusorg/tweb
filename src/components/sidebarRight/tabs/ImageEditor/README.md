@@ -1,7 +1,17 @@
 # Image Editor
 
-## Description
+## Author
+This part of project was created by <b>Eugene Chugunov</b>. He is a leader of the frontend developers 
+team in the Russian social network [vk.com](https://vk.com). 
 
+More information: [euchu.ru](https://euchu.ru).
+
+Contacts: [@echugunov](https://t.me/echugunov).
+
+## Description
+<b>Image Editor</b> is part of the telegram web application. In this 
+section user can modify the attached image. He can crop the image, 
+set various filters and add texts, lines and stickers.
 
 ## Done
 1. Added custom font for new icons (script "generate-icons" doesn't work for me).
@@ -24,30 +34,29 @@
    2. Each text layer can be selected;
    3. Added animated cursor;
    4. Selected layer can be changed (edit, text size, align, frame, color, font);
-   5. Selected layer can be moved;
+   5. Selected layer can be moved and rotated;
    6. Selected layer can be removed (press 'del', 'backspace'),
    7. History of changes.
 9. Added drawing by brushes (except eraser):
    1. Each brush layer can be selected;
    2. Selected layer can be changed (size, color, brush type);
-   3. Selected layer can be moved;
+   3. Selected layer can be moved and rotated;
    4. Selected layer can be removed (press 'del', 'backspace');
    5. Each brush image changes color after selection of new color,
    6. History of changes.
 10. Added selector of stickers:
     1. Each sticker layer can be selected;
-    2. Selected layer can be moved;
+    2. Selected layer can be moved and rotated;
     3. Selected layer can be removed (press 'del', 'backspace'),
     4. History of changes.
 11. Resizing window:
     1. Resizing cropper area;
-    2. Mo
+    2. Moving image preview to right sidebar for small windows.
 
 ## TODO
 1. Add all image filters.
 2. Add rotation and flip of image on cropper tab. 
-3. Add rotation for layers. 
-4. Add all brushes. 
-5. Add selector of custom color for text and brush. 
-6. Refactoring of color frame for text layer. 
-7. Refactoring of StickersTab class (remove emoticonsDropdown)
+3. Add all brushes. 
+4. Add selector of custom color for text and brush. 
+5. Refactoring of color frame for text layer. 
+6. Refactoring of StickersTab class (remove emoticonsDropdown)

@@ -30,7 +30,7 @@ export type Cropper = {
   height: number;
   left: number;
   top: number;
-  degree: number;
+  angle: number;
   type: CropperFormatTypes;
   isMirror: boolean;
 };
@@ -78,6 +78,7 @@ export type TextLayer = {
   top: number;
   cursorPosition: number;
   needShowCursor: boolean;
+  angle: number;
   width?: number;
   height?: number;
   isMoved?: boolean;
@@ -95,6 +96,7 @@ export type BrushLayer = {
   top: number;
   width: number;
   height: number;
+  angle: number;
   isMoved?: boolean;
   isDrawing?: boolean;
 }
@@ -107,6 +109,7 @@ export type StickerLayer = {
   width: number;
   height: number;
   isMoved?: boolean;
+  angle: number;
   size: 0;
 }
 
@@ -133,6 +136,16 @@ export type LayerMovementEventState = {
   endMovingCallback: () => void
 }
 
+export type LayerRotationEventState = {
+  mouseX: number,
+  mouseY: number,
+  layerCenterLeft: number,
+  layerCenterTop: number,
+  layerAngle: number,
+  layer: Layer,
+  endRotationCallback: () => void
+}
+
 export type BrushDrawingEventState = {
   layer: BrushLayer,
   endDrawingCallback?: () => void,
@@ -140,7 +153,7 @@ export type BrushDrawingEventState = {
   mouseY: number,
 }
 
-export type StickersList = Record<string, any>;
+export type StickersList = Record<string, HTMLImageElement>;
 
 export type Font = {
   font: string;
@@ -162,3 +175,31 @@ export type BrushIcon = {
 };
 
 export type BrushIconsList = Partial<Record<BrushStyles, BrushIcon>>;
+
+export type LayerRotation = {
+  startRotate: (event: MouseEvent | TouchEvent, state: State, selectedLayerId: number, endRotationCallback: () => void) => void;
+  removeHandlers: () => void;
+};
+
+export type LayerMovement = {
+  startMoving: (event: MouseEvent | TouchEvent, state: State, selectedLayerId: number, endRotationCallback: () => void) => void;
+  removeHandlers: () => void;
+};
+
+export type BrushDrawing = {
+  startDrawing: (event: MouseEvent | TouchEvent, layer: BrushLayer, endDrawingCallback: () => void) => void;
+  removeHandlers: () => void;
+};
+
+export type ImageCropperGetParamsResponse = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+}
+
+export type ImageCropper = {
+  getParams: () => ImageCropperGetParamsResponse;
+  removeHandlers: () => void;
+  updateCropFormat: (params: Cropper) => void;
+};

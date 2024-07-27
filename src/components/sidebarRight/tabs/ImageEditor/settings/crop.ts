@@ -2,10 +2,10 @@ import {_i18n} from '../../../../../lib/langPack';
 import {CROPPER_CUSTOM_FORMATS, CROPPER_DEFAULT_FORMATS, CropperFormatTypes} from '../constants';
 import {attachClickEvent} from '../../../../../helpers/dom/clickEvent';
 import findUpClassName from '../../../../../helpers/dom/findUpClassName';
-import {CropperFormat, State} from '../types';
+import {CropperFormat, ImageCropper, State} from '../types';
 import Icon from '../../../../icon';
 
-export function showImageCrop(element: HTMLElement, cropper: any, state: State) {
+export function showImageCrop(element: HTMLElement, cropper: ImageCropper, state: State) {
   const cropTitle = document.createElement('div');
   cropTitle.classList.add('image-editor-settings-block-title');
   _i18n(cropTitle, 'ImageEditor.Cropper.Title');

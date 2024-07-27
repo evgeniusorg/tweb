@@ -1,4 +1,4 @@
-import {Cropper, CropperEventState} from '../types';
+import {Cropper, CropperEventState, ImageCropper, ImageCropperGetParamsResponse} from '../types';
 import {CROPPER_CUSTOM_FORMATS, CROPPER_DEFAULT_FORMATS, CropperFormatTypes} from '../constants';
 import {
   resizeBottomLeftCorner,
@@ -7,7 +7,7 @@ import {
   resizeTopRigthCorner
 } from './cropperResize';
 
-function imageCropper(originalImage: HTMLImageElement, initParams: Cropper) {
+function imageCropper(originalImage: HTMLImageElement, initParams: Cropper): ImageCropper {
   let cropComponent: HTMLDivElement,
     container: HTMLDivElement,
     cropImage: HTMLImageElement,
@@ -268,7 +268,7 @@ function imageCropper(originalImage: HTMLImageElement, initParams: Cropper) {
     updateCorners(width, height, left, top);
   }
 
-  function getParams() {
+  function getParams(): ImageCropperGetParamsResponse {
     return {
       top: cropTop,
       left: cropLeft,

@@ -9,14 +9,23 @@ import ripple from '../../../ripple';
 import ButtonIcon from '../../../buttonIcon';
 import {horizontalMenu} from '../../../horizontalMenu';
 import Icon from '../../../icon';
-import {BrushIconsList, BrushLayer, State, StickerLayer, StickersList, TextLayer} from './types';
+import {
+  BrushDrawing,
+  BrushIconsList,
+  BrushLayer,
+  ImageCropper,
+  LayerMovement,
+  LayerRotation,
+  State,
+  StickerLayer,
+  StickersList,
+  TextLayer
+} from './types';
 import {
   BRUSHES,
   BrushStyles,
-  CANVAS_BORDER_PADDING,
   CANVAS_BRUSH_SIZE_DEFAULT,
   CANVAS_FONT_SIZE_DEFAULT,
-  CANVAS_LAYER_SIZE_COEFFICIENT,
   Colors,
   CropperFormatTypes,
   CURSOR_ANIMATION_DELAY,
@@ -52,6 +61,8 @@ import brushDrawing from './actions/brushDrawing';
 import {showImageStickers} from './settings/stickers';
 import {getEventPosition} from './actions/eventActions';
 import textToSvgURL from '../../../../helpers/textToSvgURL';
+import layerRotation from './actions/layerRotation';
+import {checkIsCorner, getSelectedLayerId} from './actions/layerSelection';
 
 export default class AppImageEditorTab extends SliderSuperTab {
   private image: HTMLImageElement;
@@ -65,16 +76,17 @@ export default class AppImageEditorTab extends SliderSuperTab {
   private initFile: File;
   private allFiles: File[];
 
-  private cropper: any;
-  private movement: any;
-  private brushDrawing: any;
+  private cropper: ImageCropper;
+  private movement: LayerMovement;
+  private rotation: LayerRotation;
+  private brushDrawing: BrushDrawing;
 
   private fileIndex: number;
   private selectedTab: ReturnType<typeof horizontalMenu>;
   private prevTabId: number;
 
   private cursorAnimationTimer: number;
-  private cursorAnimationFrame: any;
+  private cursorAnimationFrame: number;
 
   private prevSteps: State[];
   private nextSteps: State[];
@@ -101,7 +113,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
         height: 0,
         left: 0,
         top: 0,
-        degree: 0,
+        angle: 0,
         type: CropperFormatTypes.original,
         isMirror: false
       },
@@ -129,7 +141,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
     // settings
     this.settings = document.createElement('div');
-    this.settings.classList.add('image-editor-sidebr-settings');
+    this.settings.classList.add('image-editor-settings');
     this.scrollable.append(this.settings);
 
     // clone of selected file
@@ -167,6 +179,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.canvas.addEventListener('touchstart', this.selectCanvasLayer, false);
     this.movement = layerMovement(this.canvas, this.reRenderCanvas);
     this.brushDrawing = brushDrawing(this.canvas, this.reRenderCanvas);
+    this.rotation = layerRotation(this.canvas, this.reRenderCanvas);
 
     const header = document.createElement('div');
     this.header.append(header);
@@ -210,7 +223,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
           height: this.image.height,
           left: 0,
           top: 0,
-          degree: 0,
+          angle: 0,
           type: CropperFormatTypes.original,
           isMirror: false
         }
@@ -255,35 +268,17 @@ export default class AppImageEditorTab extends SliderSuperTab {
   private selectCanvasLayer(event: MouseEvent | TouchEvent) {
     const {left, top} = getEventPosition(event, this.canvas);
 
-    function getSelectedLayerId(type: LayerTypes, state: State) {
-      let selectedLayerId: number = null;
-
-      for(let i = state.layers.length - 1; i >= 0; i--) {
-        const layer = state.layers[i];
-        if(layer.type !== type) continue;
-
-        if(
-          left < layer.left - CANVAS_BORDER_PADDING ||
-          left > layer.left + layer.width + CANVAS_BORDER_PADDING
-        ) continue;
-
-        if(
-          top < layer.top - layer.size * CANVAS_LAYER_SIZE_COEFFICIENT - CANVAS_BORDER_PADDING ||
-          top > layer.top - layer.size * CANVAS_LAYER_SIZE_COEFFICIENT + layer.height + CANVAS_BORDER_PADDING
-        ) continue;
-
-        selectedLayerId = i;
-        break;
-      }
-
-      return selectedLayerId;
-    }
-
     switch(this.prevTabId) {
       case TabTypes.filters:
         return;
       case TabTypes.text: {
-        const selectedLayerId = getSelectedLayerId(LayerTypes.text, this.state);
+        // start rotation
+        if(this.state.selectedLayerId !== null && checkIsCorner(left, top, this.state.layers[this.state.selectedLayerId])) {
+          this.rotation.startRotate(event, this.state, this.state.selectedLayerId, this.updateHistory);
+          return;
+        }
+
+        const selectedLayerId = getSelectedLayerId(left, top, LayerTypes.text, this.state);
         if(this.state.editedLayerId !== null) {
           // continue to edit
           if(this.state.editedLayerId === selectedLayerId) {
@@ -349,12 +344,16 @@ export default class AppImageEditorTab extends SliderSuperTab {
         return;
       }
       case TabTypes.brush: {
-        const selectedLayerId = getSelectedLayerId(LayerTypes.brush, this.state);
+        // start rotation
+        if(this.state.selectedLayerId !== null && checkIsCorner(left, top, this.state.layers[this.state.selectedLayerId])) {
+          this.rotation.startRotate(event, this.state, this.state.selectedLayerId, this.updateHistory);
+          return;
+        }
+
+        const selectedLayerId = getSelectedLayerId(left, top, LayerTypes.brush, this.state);
         // start moving
         if(this.state.selectedLayerId !== null && this.state.selectedLayerId === selectedLayerId) {
-          this.movement.startMoving(event, this.state, selectedLayerId, () => {
-            this.updateHistory();
-          });
+          this.movement.startMoving(event, this.state, selectedLayerId, this.updateHistory);
           return;
         }
 
@@ -388,13 +387,17 @@ export default class AppImageEditorTab extends SliderSuperTab {
       }
 
       case TabTypes.stickers: {
-        const selectedLayerId = getSelectedLayerId(LayerTypes.sticker, this.state);
+        // start rotation
+        if(this.state.selectedLayerId !== null && checkIsCorner(left, top, this.state.layers[this.state.selectedLayerId])) {
+          this.rotation.startRotate(event, this.state, this.state.selectedLayerId, this.updateHistory);
+          return;
+        }
+
+        const selectedLayerId = getSelectedLayerId(left, top, LayerTypes.sticker, this.state);
 
         // start moving
         if(this.state.selectedLayerId !== null && this.state.selectedLayerId === selectedLayerId) {
-          this.movement.startMoving(event, this.state, selectedLayerId, () => {
-            this.updateHistory();
-          });
+          this.movement.startMoving(event, this.state, selectedLayerId, this.updateHistory);
           return;
         }
 
@@ -468,6 +471,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
       frame: this.state.textSettings.frame,
       cursorPosition: defaultText.length,
       needShowCursor: true,
+      angle: 0,
       left,
       top
     };
@@ -495,6 +499,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
       style: this.state.brushSettings.style,
       left: left,
       top: top,
+      angle: 0,
       width: 0,
       height: 0
     };
@@ -536,6 +541,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
         left: (this.canvas.offsetWidth - width) / 2,
         width,
         height,
+        angle: 0,
         size: 0
       };
 

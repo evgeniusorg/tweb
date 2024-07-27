@@ -1,7 +1,7 @@
-import {BrushDrawingEventState, BrushLayer} from '../types';
+import {BrushDrawing, BrushDrawingEventState, BrushLayer} from '../types';
 import {getEventPosition} from './eventActions';
 
-function brushDrawing(canvas: HTMLCanvasElement, reRender: () => void) {
+function brushDrawing(canvas: HTMLCanvasElement, reRender: () => void): BrushDrawing {
   const eventState: BrushDrawingEventState = {
     layer: null,
     endDrawingCallback: null,

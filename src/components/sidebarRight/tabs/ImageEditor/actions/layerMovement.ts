@@ -1,7 +1,7 @@
-import {LayerMovementEventState, State} from '../types';
+import {LayerMovement, LayerMovementEventState, State} from '../types';
 import {getEventPosition} from './eventActions';
 
-function layerMovement(canvas: HTMLCanvasElement, reRender: () => void) {
+function layerMovement(canvas: HTMLCanvasElement, reRender: () => void): LayerMovement {
   const eventState: LayerMovementEventState = {
     mouseX: 0,
     mouseY: 0,
