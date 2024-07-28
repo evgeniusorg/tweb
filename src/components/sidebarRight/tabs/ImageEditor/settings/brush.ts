@@ -98,11 +98,13 @@ function getBrushesList(
     const brushStyle = brushBtn.dataset.style as BrushStyles;
     const brushColor = brushIcons[brushStyle].color;
 
+    // update color on RangeSelector
     state.brushSettings.style = brushBtn.dataset.style as BrushStyles;
     state.brushSettings.color = brushColor;
     selectColor(element, brushColor);
     updateRangeSelectorColor(element, brushColor);
 
+    // update selected layer
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.brush) {
       const layer = state.layers[state.selectedLayerId] as BrushLayer;
       layer.style = brushStyle;
@@ -126,6 +128,7 @@ export function showImageBrushes(
   const selectColor = (color: string) => {
     state.brushSettings.color = color;
 
+    // update selected layer
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.brush) {
       const layer = state.layers[state.selectedLayerId] as BrushLayer;
       layer.color = color;
@@ -133,8 +136,10 @@ export function showImageBrushes(
       reRenderCanvas();
     }
 
+    // update color on RangeSelector
     updateRangeSelectorColor(element, color);
 
+    // update color on selected brush
     const activeBrushBtn = element
     .getElementsByClassName('image-editor-sidebar-settings-list-btn active')[0] as HTMLElement;
     updateActiveBrushBtnColor(activeBrushBtn, color, brushIcons);
@@ -144,6 +149,7 @@ export function showImageBrushes(
     state.brushSettings.size = size;
     let timer: ReturnType<typeof setTimeout> = null;
 
+    // update selected layer
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.brush) {
       const layer = state.layers[state.selectedLayerId] as BrushLayer;
       layer.size = size;
@@ -152,6 +158,7 @@ export function showImageBrushes(
       if(timer) {
         clearTimeout(timer);
       }
+      // set changes to history
       timer = setTimeout(updateHistory, SIZE_RANGE_UPDATE_HISTORY_DELAY);
     }
   }

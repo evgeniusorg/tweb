@@ -19,24 +19,32 @@ export function keydown(
 
   if(editedLayer) {
     if(event.key.toLowerCase() === 'backspace') {
-      if(editedLayer.cursorPosition === 0) return;
+      if(editedLayer.cursorPosition === 0) {
+        return;
+      }
 
-      let deletedCharNumber = 1
-      if(editedLayer.cursorPosition > 1 && editedLayer.text.slice(editedLayer.cursorPosition - 2, editedLayer.cursorPosition) === '/n')
-        deletedCharNumber = 2
+      let deletedCharNumber = 1;
+      if(editedLayer.cursorPosition > 1 &&
+        editedLayer.text.slice(editedLayer.cursorPosition - 2, editedLayer.cursorPosition) === '/n') {
+        deletedCharNumber = 2;
+      }
 
-      editedLayer.text = editedLayer.text.slice(0, editedLayer.cursorPosition - deletedCharNumber) + editedLayer.text.slice(editedLayer.cursorPosition)
-      editedLayer.cursorPosition -= deletedCharNumber
+      editedLayer.text = editedLayer.text.slice(0, editedLayer.cursorPosition - deletedCharNumber) + editedLayer.text.slice(editedLayer.cursorPosition);
+      editedLayer.cursorPosition -= deletedCharNumber;
     }
 
     if(event.key.toLowerCase() === 'arrowleft') {
-      const steps = editedLayer.cursorPosition > 1 && editedLayer.text.slice(editedLayer.cursorPosition - 2, editedLayer.cursorPosition) === '/n' ? 2 : 1
+      const steps = editedLayer.cursorPosition > 1 &&
+        editedLayer.text.slice(editedLayer.cursorPosition - 2, editedLayer.cursorPosition) === '/n' ? 2 : 1;
       editedLayer.cursorPosition -= steps;
     }
 
     if(event.key.toLowerCase() === 'arrowright') {
-      const steps = editedLayer.text.slice(editedLayer.cursorPosition, editedLayer.cursorPosition + 2) === '/n' ? 2 : 1
-      if(editedLayer.text.length <= editedLayer.cursorPosition) return;
+      const steps = editedLayer.text.slice(editedLayer.cursorPosition, editedLayer.cursorPosition + 2) === '/n' ? 2 : 1;
+      if(editedLayer.text.length <= editedLayer.cursorPosition) {
+        return;
+      }
+
       editedLayer.cursorPosition += steps;
     }
 
@@ -67,17 +75,21 @@ export function keypress(event: KeyboardEvent, canvas: HTMLCanvasElement, state:
   const layer = state.layers[state.editedLayerId] as TextLayer;
 
   if(event.key.toLowerCase() === 'enter') {
-    layer.text = layer.text.slice(0, layer.cursorPosition) + '/n' + layer.text.slice(layer.cursorPosition)
+    layer.text = layer.text.slice(0, layer.cursorPosition) + '/n' + layer.text.slice(layer.cursorPosition);
     layer.cursorPosition += 2;
   } else {
     let char = String.fromCharCode(event.keyCode)
 
-    if(!char && char !== ' ') return
-    if(!event.shiftKey) char = char.toLowerCase()
+    if(!char && char !== ' ') {
+      return;
+    }
 
-    layer.text =
-      layer.text.slice(0, layer.cursorPosition) + char + layer.text.slice(layer.cursorPosition)
-    layer.cursorPosition += 1
+    if(!event.shiftKey) {
+      char = char.toLowerCase();
+    }
+
+    layer.text = layer.text.slice(0, layer.cursorPosition) + char + layer.text.slice(layer.cursorPosition);
+    layer.cursorPosition += 1;
   }
 
   const {width, height} = getTextBoundary(layer, context);

@@ -235,7 +235,10 @@ export function renderText(canvas: HTMLCanvasElement, layer: TextLayer, isSelect
   let initTop = layer.top;
 
   if(layer.width && layer.angle) {
-    context.translate((layer.left + layer.width / 2)  * scaledRatio, (layer.top - layer.size * CANVAS_FONT_LINE_HEIGHT_COEFFICIENT + layer.height / 2)  * scaledRatio);
+    context.translate(
+      (layer.left + layer.width / 2)  * scaledRatio,
+      (layer.top - layer.size * CANVAS_FONT_LINE_HEIGHT_COEFFICIENT + layer.height / 2)  * scaledRatio
+    );
     context.rotate(layer.angle);
     initLeft = -layer.width / 2;
     initTop = layer.size * CANVAS_FONT_LINE_HEIGHT_COEFFICIENT - layer.height / 2;
@@ -330,7 +333,9 @@ export function renderText(canvas: HTMLCanvasElement, layer: TextLayer, isSelect
 }
 
 export function renderBrushPath(canvas: HTMLCanvasElement, layer: BrushLayer, isSelected: boolean) {
-  if(!layer.points.length) return;
+  if(!layer.points.length) {
+    return;
+  }
 
   const scaledRatio = canvas.width / canvas.offsetWidth;
 
@@ -440,7 +445,12 @@ export function renderBrushPath(canvas: HTMLCanvasElement, layer: BrushLayer, is
   }
 }
 
-export function renderSticker(canvas: HTMLCanvasElement, layer: StickerLayer, stickers: StickersList, isSelected: boolean) {
+export function renderSticker(
+  canvas: HTMLCanvasElement,
+  layer: StickerLayer,
+  stickers: StickersList,
+  isSelected: boolean
+) {
   const scaledRatio = canvas.width / canvas.offsetWidth;
 
   const context = canvas.getContext('2d');

@@ -29,9 +29,9 @@ function brushDrawing(canvas: HTMLCanvasElement, reRender: () => void): BrushDra
     const {left, top} = getEventPosition(event, canvas);
 
     eventState.layer = layer;
-    eventState.endDrawingCallback = endDrawingCallback;
     eventState.mouseX = left;
     eventState.mouseY = top;
+    eventState.endDrawingCallback = endDrawingCallback;
 
     canvas.addEventListener('mousemove', moving);
     canvas.addEventListener('touchmove', moving);

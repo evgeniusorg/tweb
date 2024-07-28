@@ -78,6 +78,7 @@ function getFontStyles(state: State, reRenderCanvas: () => void, updateHistory: 
       state.textSettings.frame = btn.dataset.value as TextFrame;
     }
 
+    // update selected layer
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.text) {
       const layer = state.layers[state.selectedLayerId] as TextLayer;
       if(btn.dataset.type === 'align') {
@@ -130,6 +131,7 @@ function getFontsList(
 
     state.textSettings.font = fontBtn.dataset.font;
 
+    // update selected layer
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.text) {
       const context = canvas.getContext('2d');
       const layer = state.layers[state.selectedLayerId] as TextLayer;
@@ -158,6 +160,7 @@ export function showImageText(
   const selectColor = (color: string) => {
     state.textSettings.color = color;
 
+    // update selected layer
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.text) {
       const layer = state.layers[state.selectedLayerId] as TextLayer;
       layer.color = color;
@@ -165,6 +168,7 @@ export function showImageText(
       reRenderCanvas();
     }
 
+    // update color on RangeSelector
     updateRangeSelectorColor(element, color);
   };
 
@@ -173,6 +177,7 @@ export function showImageText(
   const selectFontSize = (size: number) => {
     state.textSettings.size = size;
 
+    // update selected layer
     if(state.selectedLayerId !== null && state.layers[state.selectedLayerId].type === LayerTypes.text) {
       const context = canvas.getContext('2d');
       const layer = state.layers[state.selectedLayerId] as TextLayer;
@@ -186,6 +191,7 @@ export function showImageText(
       if(timer) {
         clearTimeout(timer);
       }
+      // set changes to history
       timer = setTimeout(updateHistory, SIZE_RANGE_UPDATE_HISTORY_DELAY);
     }
   }

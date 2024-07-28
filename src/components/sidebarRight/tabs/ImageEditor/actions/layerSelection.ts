@@ -63,27 +63,43 @@ export function checkIsCorner(left: number, top: number, layer: Layer) {
 
   // top left corner
   if(
-    angleLeft <= layer.left - CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE && angleLeft >= layer.left - CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE &&
-    angleTop <= layerTop - CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE && angleTop >= layerTop - CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE
-  ) return true;
+    angleLeft <= layer.left - CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE &&
+    angleLeft >= layer.left - CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE &&
+    angleTop <= layerTop - CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE &&
+    angleTop >= layerTop - CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE
+  ) {
+    return true;
+  }
 
   // top right corner
   if(
-    angleLeft <= layer.left + layer.width + CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE && angleLeft >= layer.left + layer.width + CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE &&
-    angleTop <= layerTop - CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE && angleTop >= layerTop - CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE
-  ) return true;
+    angleLeft <= layer.left + layer.width + CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE &&
+    angleLeft >= layer.left + layer.width + CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE &&
+    angleTop <= layerTop - CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE &&
+    angleTop >= layerTop - CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE
+  ) {
+    return true;
+  }
 
   // bottom left corner
   if(
-    angleLeft <= layer.left - CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE && angleLeft >= layer.left - CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE &&
-    angleTop <= layerTop + layer.height + CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE && angleTop >= layerTop + layer.height + CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE
-  ) return true;
+    angleLeft <= layer.left - CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE &&
+    angleLeft >= layer.left - CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE &&
+    angleTop <= layerTop + layer.height + CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE &&
+    angleTop >= layerTop + layer.height + CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE
+  ) {
+    return true;
+  }
 
   // bottom right corner
   if(
-    angleLeft <= layer.left + layer.width + CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE && angleLeft >= layer.left + layer.width + CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE &&
-    angleTop <= layerTop + layer.height + CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE && angleTop >= layerTop + layer.height + CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE
-  ) return true;
+    angleLeft <= layer.left + layer.width + CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE &&
+    angleLeft >= layer.left + layer.width + CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE &&
+    angleTop <= layerTop + layer.height + CANVAS_BORDER_PADDING + CANVAS_LAYER_CORNER_SIZE &&
+    angleTop >= layerTop + layer.height + CANVAS_BORDER_PADDING - CANVAS_LAYER_CORNER_SIZE
+  ) {
+    return true;
+  }
 
   return false;
 }

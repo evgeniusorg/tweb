@@ -14,7 +14,7 @@ section user can modify the attached image. He can crop the image,
 set various filters and add texts, lines and stickers.
 
 ## Done
-1. Added custom font for new icons (script "generate-icons" doesn't work for me).
+1. Added custom font for new icons.
 2. Moved RangeSettingSelector to common components:
    1. Added color for selected value;
    2. Added start to center;

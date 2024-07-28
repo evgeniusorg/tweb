@@ -25,7 +25,12 @@ function layerRotation(canvas: HTMLCanvasElement, reRender: () => void): LayerRo
     canvas.removeEventListener('touchmove', rotate);
   }
 
-  function startRotate(event: MouseEvent | TouchEvent, state: State, selectedLayerId: number, endRotationCallback: () => void) {
+  function startRotate(
+    event: MouseEvent | TouchEvent,
+    state: State,
+    selectedLayerId: number,
+    endRotationCallback: () => void
+  ) {
     event.preventDefault();
     event.stopPropagation();
 

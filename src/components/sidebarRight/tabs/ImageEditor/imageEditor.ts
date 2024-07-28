@@ -112,6 +112,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.fileIndex = fileIndex;
     this.allFiles = [...allFiles];
 
+    // init state
     this.state = {
       filters: {},
       layers: [],
@@ -182,7 +183,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.canvas = document.createElement('canvas');
     this.canvas.classList.add('image-editor-canvas');
     this.preview.append(this.canvas);
-    this.canvas.addEventListener('mousedown', this.selectCanvasLayer );
+    this.canvas.addEventListener('mousedown', this.selectCanvasLayer);
     this.canvas.addEventListener('touchstart', this.selectCanvasLayer);
     this.movement = layerMovement(this.canvas, this.reRenderCanvas);
     this.brushDrawing = brushDrawing(this.canvas, this.reRenderCanvas);
@@ -580,7 +581,9 @@ export default class AppImageEditorTab extends SliderSuperTab {
   }
 
   private undo() {
-    if(this.prevSteps.length < 2) return;
+    if(this.prevSteps.length < 2) {
+      return;
+    }
 
     this.nextSteps.push(structuredClone(this.prevSteps.pop()));
     this.redoBtn.removeAttribute('disabled');
@@ -596,7 +599,9 @@ export default class AppImageEditorTab extends SliderSuperTab {
   }
 
   private redo() {
-    if(this.nextSteps.length === 0) return;
+    if(this.nextSteps.length === 0) {
+      return;
+    }
 
     this.state = structuredClone(this.nextSteps.pop());
     this.prevSteps.push(structuredClone(this.state));
@@ -651,6 +656,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
       return;
     }
 
+    // go from text tab
     if(this.prevTabId === TabTypes.text) {
       this.state.editedLayerId = null;
       this.state.selectedLayerId = null;
@@ -659,6 +665,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
       window.removeEventListener('keydown', this.keydown);
     }
 
+    // go from crop tab
     if(this.prevTabId === TabTypes.crop) {
       this.changePreview(PreviewTypes.canvas);
       this.state.cropper = {
@@ -670,12 +677,14 @@ export default class AppImageEditorTab extends SliderSuperTab {
       this.reRenderCanvas();
     }
 
+    // go from brush tab
     if(this.prevTabId === TabTypes.brush) {
       this.state.selectedLayerId = null;
       this.reRenderCanvas();
       window.removeEventListener('keydown', this.keydown);
     }
 
+    // go from stickers tab
     if(this.prevTabId === TabTypes.stickers) {
       this.state.selectedLayerId = null;
       this.reRenderCanvas();
@@ -720,12 +729,13 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.cropper?.removeHandlers();
     this.movement?.removeHandlers();
 
-    this.canvas.removeEventListener('mousedown', this.selectCanvasLayer, false);
-    this.canvas.removeEventListener('touchstart', this.selectCanvasLayer, false);
+    this.canvas.removeEventListener('mousedown', this.selectCanvasLayer);
+    this.canvas.removeEventListener('touchstart', this.selectCanvasLayer);
     window.removeEventListener('resize', this.resizeWindow);
 
     this.endEditText();
 
+    // open NewMedia popout
     setTimeout(() => {
       this.preview.remove();
       PopupElement.createPopup(PopupNewMedia, appImManager.chat, files, 'media');
@@ -759,6 +769,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
   }
 
   private getBrushIcons() {
+    // load brush images from .svg files
     for(const {style, iconUrl, defaultColor} of BRUSHES) {
       fetch(iconUrl)
       .then((res) => res.text())
@@ -780,6 +791,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
     const width = window.innerWidth;
     const tabsContainer = this.content.getElementsByClassName('image-editor-sidebar-settings-tabs')[0];
 
+    // small size
     if(width < RESIZE_WINDOW_SMALL_SIZE_WIDTH &&
       this.preview.parentElement === document.getElementById('main-columns')
     ) {
@@ -789,6 +801,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
       return;
     }
 
+    // full screen
     if(width >= RESIZE_WINDOW_SMALL_SIZE_WIDTH && this.preview.parentElement === tabsContainer) {
       this.preview.remove();
       const sidebar =  document.getElementById('column-right');
