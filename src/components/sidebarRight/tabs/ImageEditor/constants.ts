@@ -1,3 +1,9 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import {Brush, CropperFormat, Filter, Font, Tab} from './types';
 
 export enum PreviewTypes {

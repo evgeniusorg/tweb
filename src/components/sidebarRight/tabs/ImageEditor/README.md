@@ -1,8 +1,8 @@
 # Image Editor
 
 ## Author
-This part of project was created by <b>Eugene Chugunov</b>. He is a leader of the frontend developers 
-team in the Russian social network [vk.com](https://vk.com). 
+This part of project was created by <b>Eugene Chugunov</b> (a leader of the frontend developers 
+team in the Russian social network [vk.com](https://vk.com)). 
 
 More information: [euchu.ru](https://euchu.ru).
 
@@ -17,18 +17,20 @@ set various filters and add texts, lines and stickers.
 1. Added custom font for new icons (script "generate-icons" doesn't work for me).
 2. Moved RangeSettingSelector to common components:
    1. Added color for selected value;
-   2. Added start to center.
-   3. Added custom color
+   2. Added start to center;
+   3. Added custom color.
 3. Added menu for image/video on newMedia popout:
    1. Image editor (for photo);
    2. Spoiler;
-   3. Deleting file.
+   3. File deletion.
 4. Added right sidebar for image editor.
 5. Added preview of image for image editor.
-6. Added cropper of image.
+6. Added cropper of image:
    1. All cropper formats;
    2. History of changes.
-7. Added 3 filters for image (brightness, contrast, saturation).
+7. Added filters for image:
+   1. Added "Brightness", "Contrast", "Saturation" filters;
+   2. History of changes.
 8. Added text layers:
    1. Text can have several lines (pres 'Shift' + 'Enter');
    2. Each text layer can be selected;
@@ -56,7 +58,9 @@ set various filters and add texts, lines and stickers.
 ## TODO
 1. Add all image filters.
 2. Add rotation and flip of image on cropper tab. 
-3. Add all brushes. 
+3. Add "Blur" and "Eraser" brushes. 
 4. Add selector of custom color for text and brush. 
-5. Refactoring of color frame for text layer. 
-6. Refactoring of StickersTab class (remove emoticonsDropdown)
+5. Add resizing of stickers. 
+6. Refactoring of color frame for text layer. 
+7. Refactoring of StickersTab class (remove emoticonsDropdown).
+8. Refactoring render of "Brush".

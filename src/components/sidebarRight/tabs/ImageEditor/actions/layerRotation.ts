@@ -1,3 +1,9 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import {LayerRotation, LayerRotationEventState, State} from '../types';
 import {getEventPosition} from './eventActions';
 
@@ -42,10 +48,7 @@ function layerRotation(canvas: HTMLCanvasElement, reRender: () => void): LayerRo
 
   function endRotate(event: MouseEvent | TouchEvent) {
     event.preventDefault();
-    canvas.removeEventListener('mouseup', endRotate);
-    canvas.removeEventListener('touchend', endRotate);
-    canvas.removeEventListener('mousemove', rotate);
-    canvas.removeEventListener('touchmove', rotate);
+    removeHandlers();
 
     eventState.endRotationCallback?.();
   }

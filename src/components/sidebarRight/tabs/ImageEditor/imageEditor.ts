@@ -1,3 +1,9 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import {SliderSuperTab} from '../../../slider';
 import {attachClickEvent} from '../../../../helpers/dom/clickEvent';
 import PopupElement from '../../../popups';
@@ -55,7 +61,7 @@ import {showImageFilters} from './settings/filters';
 import {showImageCrop} from './settings/crop';
 import {showImageText} from './settings/text';
 import {replaceBrushColorOnText, showImageBrushes} from './settings/brush';
-import imageCropper from './actions/cropper';
+import imageCropper from './actions/imageCropper';
 import {keydown, keypress} from './actions/textEditor';
 import brushDrawing from './actions/brushDrawing';
 import {showImageStickers} from './settings/stickers';
@@ -88,11 +94,12 @@ export default class AppImageEditorTab extends SliderSuperTab {
   private cursorAnimationTimer: number;
   private cursorAnimationFrame: number;
 
+  private state: State;
   private prevSteps: State[];
   private nextSteps: State[];
+
   private stickers: StickersList;
   private brushIcons: BrushIconsList;
-  private state: State;
 
   public init(
     fileIndex: number,
@@ -141,7 +148,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
     // settings
     this.settings = document.createElement('div');
-    this.settings.classList.add('image-editor-settings');
+    this.settings.classList.add('image-editor-sidebar-settings');
     this.scrollable.append(this.settings);
 
     // clone of selected file
@@ -175,8 +182,8 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.canvas = document.createElement('canvas');
     this.canvas.classList.add('image-editor-canvas');
     this.preview.append(this.canvas);
-    this.canvas.addEventListener('mousedown', this.selectCanvasLayer, false);
-    this.canvas.addEventListener('touchstart', this.selectCanvasLayer, false);
+    this.canvas.addEventListener('mousedown', this.selectCanvasLayer );
+    this.canvas.addEventListener('touchstart', this.selectCanvasLayer);
     this.movement = layerMovement(this.canvas, this.reRenderCanvas);
     this.brushDrawing = brushDrawing(this.canvas, this.reRenderCanvas);
     this.rotation = layerRotation(this.canvas, this.reRenderCanvas);
@@ -185,7 +192,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
     this.header.append(header);
 
     const headerBtns = document.createElement('div');
-    headerBtns.classList.add('image-editor-header-btns');
+    headerBtns.classList.add('image-editor-sidebar-header-btns');
     header.append(headerBtns);
 
     this.undoBtn = ButtonIcon('icon_undo');
@@ -610,7 +617,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
   private createTabs() {
     const tabsContainer = document.createElement('div');
-    tabsContainer.classList.add('search-super-tabs-container', 'tabs-container', 'image-editor-settings-tabs');
+    tabsContainer.classList.add('search-super-tabs-container', 'tabs-container', 'image-editor-sidebar-settings-tabs');
 
     const tabs = document.createElement('nav');
     tabs.classList.add('menu-horizontal-div');
@@ -771,7 +778,7 @@ export default class AppImageEditorTab extends SliderSuperTab {
 
   private resizeWindow() {
     const width = window.innerWidth;
-    const tabsContainer = this.content.getElementsByClassName('image-editor-settings-tabs')[0];
+    const tabsContainer = this.content.getElementsByClassName('image-editor-sidebar-settings-tabs')[0];
 
     if(width < RESIZE_WINDOW_SMALL_SIZE_WIDTH &&
       this.preview.parentElement === document.getElementById('main-columns')

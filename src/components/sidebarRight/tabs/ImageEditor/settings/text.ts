@@ -1,5 +1,10 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import {
-  Colors,
   FONTS,
   LayerTypes,
   SIZE_RANGE_FONT_MAX,
@@ -18,17 +23,17 @@ import {_i18n} from '../../../../../lib/langPack';
 
 function getFontStyles(state: State, reRenderCanvas: () => void, updateHistory: () => void) {
   const fontStyles = document.createElement('div');
-  fontStyles.classList.add('image-editor-font-styles');
+  fontStyles.classList.add('image-editor-sidebar-settings-font-styles');
 
   const fontAligns = document.createElement('div');
-  fontAligns.classList.add('image-editor-font-styles-aligns');
+  fontAligns.classList.add('image-editor-sidebar-settings-font-styles-aligns');
 
   const fontFrames = document.createElement('div');
-  fontFrames.classList.add('image-editor-font-styles-frames');
+  fontFrames.classList.add('image-editor-sidebar-settings-font-styles-frames');
 
   Object.keys(TextAlign).forEach((align) => {
     const btn = ButtonIcon(`icon_align_${align}`);
-    btn.classList.add('image-editor-font-styles-btn');
+    btn.classList.add('image-editor-sidebar-settings-font-styles-btn');
     btn.dataset.type = 'align';
     btn.dataset.value = align;
 
@@ -41,7 +46,7 @@ function getFontStyles(state: State, reRenderCanvas: () => void, updateHistory: 
 
   Object.keys(TextFrame).forEach((frame) => {
     const btn = ButtonIcon(`icon_frame_${frame}`);
-    btn.classList.add('image-editor-font-styles-btn');
+    btn.classList.add('image-editor-sidebar-settings-font-styles-btn');
     btn.dataset.type = 'frame';
     btn.dataset.value = frame;
 
@@ -56,7 +61,7 @@ function getFontStyles(state: State, reRenderCanvas: () => void, updateHistory: 
   fontStyles.append(fontFrames);
 
   attachClickEvent(fontStyles, (e) => {
-    const btn = findUpClassName(e.target, 'image-editor-font-styles-btn');
+    const btn = findUpClassName(e.target, 'image-editor-sidebar-settings-font-styles-btn');
 
     if(!btn) {
       return;
@@ -96,11 +101,11 @@ function getFontsList(
   updateHistory: () => void
 ) {
   const fontsList = document.createElement('div');
-  fontsList.classList.add('image-editor-settings-list');
+  fontsList.classList.add('image-editor-sidebar-settings-list');
 
   FONTS.forEach(({font, title}) => {
     const btn = document.createElement('div');
-    btn.classList.add('btn-menu-item', 'rp-overflow', 'image-editor-settings-list-btn');
+    btn.classList.add('btn-menu-item', 'rp-overflow', 'image-editor-sidebar-settings-list-btn');
     btn.style.setProperty('font-family', font);
     btn.append(title);
     btn.dataset.font = font;
@@ -113,7 +118,7 @@ function getFontsList(
   });
 
   attachClickEvent(fontsList, (e) => {
-    const fontBtn = findUpClassName(e.target, 'image-editor-settings-list-btn');
+    const fontBtn = findUpClassName(e.target, 'image-editor-sidebar-settings-list-btn');
 
     if(!fontBtn) {
       return;
@@ -196,7 +201,7 @@ export function showImageText(
   updateRangeSelectorColor(textSettings, state.textSettings.color);
 
   const title = document.createElement('div');
-  title.classList.add('image-editor-settings-block-title');
+  title.classList.add('image-editor-sidebar-settings-block-title');
   _i18n(title, 'ImageEditor.Font.Title');
   textSettings.append(title);
 

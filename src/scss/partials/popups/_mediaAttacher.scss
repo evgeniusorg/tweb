@@ -224,8 +224,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0px 4px;
-    border-radius: 16px;
+    padding: 0rem 0.25rem;
+    border-radius: 1rem;
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(17.5px);
     transform: translateX(-50%);
@@ -237,8 +237,8 @@
     }
 
     .btn-icon {
-      padding: 6px;
-      font-size: 20px;
+      padding: 0.375rem;
+      font-size: 1.25rem;
 
       &:hover .button-icon {
         color: rgba(255, 255, 255, 1);

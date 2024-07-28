@@ -1,3 +1,9 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import {LayerMovement, LayerMovementEventState, State} from '../types';
 import {getEventPosition} from './eventActions';
 
@@ -43,10 +49,7 @@ function layerMovement(canvas: HTMLCanvasElement, reRender: () => void): LayerMo
 
   function endMoving(event: MouseEvent | TouchEvent) {
     event.preventDefault();
-    canvas.removeEventListener('mouseup', endMoving);
-    canvas.removeEventListener('touchend', endMoving);
-    canvas.removeEventListener('mousemove', moving);
-    canvas.removeEventListener('touchmove', moving);
+    removeHandlers();
 
     eventState.endMovingCallback?.();
     eventState.layer.isMoved = false;

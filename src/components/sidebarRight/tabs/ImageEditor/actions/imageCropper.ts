@@ -1,3 +1,9 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import {Cropper, CropperEventState, ImageCropper, ImageCropperGetParamsResponse} from '../types';
 import {CROPPER_CUSTOM_FORMATS, CROPPER_DEFAULT_FORMATS, CropperFormatTypes} from '../constants';
 import {
@@ -5,7 +11,7 @@ import {
   resizeBottomRightCorner,
   resizeTopLeftCorner,
   resizeTopRigthCorner
-} from './cropperResize';
+} from './imageCropperResize';
 
 function imageCropper(originalImage: HTMLImageElement, initParams: Cropper): ImageCropper {
   let cropComponent: HTMLDivElement,

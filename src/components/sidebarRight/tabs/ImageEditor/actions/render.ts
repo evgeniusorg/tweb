@@ -1,3 +1,9 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import {
   BrushStyles,
   CANVAS_BORDER_CORNER_RADIUS,
@@ -8,7 +14,7 @@ import {
   TextAlign,
   TextFrame
 } from '../constants';
-import {BrushLayer, Layer, State, StickerLayer, StickersList, TextLayer} from '../types';
+import {BrushLayer, State, StickerLayer, StickersList, TextLayer} from '../types';
 
 export function getTextBoundary(layer: TextLayer, context: CanvasRenderingContext2D) {
   const lines = layer.text.split('/n')
@@ -54,6 +60,7 @@ export function getBrushPathBoundary(layer: BrushLayer) {
     top: minY - layer.size /2
   };
 }
+
 export function renderFilters(canvas: HTMLCanvasElement, state: State) {
   if(Object.keys(state.filters).length === 0) {
     return;

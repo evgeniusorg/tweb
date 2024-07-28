@@ -1,3 +1,9 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import appSidebarLeft from '../../../../sidebarLeft';
 import StickersTab from '../../../../emoticonsDropdown/tabs/stickers';
 import appImManager from '../../../../../lib/appManagers/appImManager';
@@ -10,7 +16,7 @@ export function showImageStickers(
   addSticker: (event: {target: Element | EventTarget}) => void
 ) {
   const stickersSettings = document.createElement('div');
-  stickersSettings.classList.add('image-editor-settings-stickers')
+  stickersSettings.classList.add('image-editor-sidebar-settings-stickers')
 
   const pseudoEmoticonsDropdown = stickersSettings;
   // @ts-ignore

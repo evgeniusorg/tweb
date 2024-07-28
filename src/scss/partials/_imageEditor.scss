@@ -1,3 +1,9 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 .image-editor {
   &-preview {
     width: calc(100% - var(--right-column-width));
@@ -145,6 +151,11 @@
     }
   }
 
+  &-canvas {
+    max-width: 100%;
+    max-height: 100%;
+  }
+
   &-sidebar {
     &--small {
       .image-editor-preview {
@@ -177,8 +188,8 @@
         padding: 0;
 
         .btn-icon {
-          font-size: 24px;
-          padding: 12px;
+          font-size: 1.5rem;
+          padding: 0.75rem;
         }
 
         &.active {
@@ -188,193 +199,188 @@
         }
       }
     }
-  }
 
-  &-header {
-    &-btns {
-      display: flex;
-    }
-  }
-
-  &-settings {
-    position: absolute;
-    padding: 3rem 0 4rem;
-    width: 100%;
-    min-height: 100%;
-
-    &-tabs {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .range-setting-selector-name {
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1.25rem;
-      color: var(--secondary-text-color);
-    }
-
-    &-block-title {
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1.25rem;
-      color: var(--secondary-text-color);
-      padding: 1rem 0.875rem;
-    }
-
-    &-filter {
-      &--disabled {
-        opacity: 0.4;
-        pointer-events: none;
+    &-header {
+      &-btns {
+        display: flex;
       }
     }
 
-    &-stickers {
-      padding: 1rem;
-      height: calc(100vh - 10rem);
-    }
+    &-settings {
+      position: absolute;
+      padding: 3rem 0 4rem;
+      width: 100%;
+      min-height: 100%;
 
-    &-list {
-      .btn-menu-item {
-        height: 3rem;
-
-        &.active {
-          background-color: var(--light-secondary-text-color);
-
-          .image-editor-settings-list-btn-icon--brush {
-            width: 120px;
-          }
-        }
+      &-tabs {
+        display: flex;
+        flex-direction: column;
       }
 
-      &-btn {
+      .range-setting-selector-name {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.25rem;
+        color: var(--secondary-text-color);
+      }
+
+      &-block-title {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.25rem;
+        color: var(--secondary-text-color);
+        padding: 1rem 0.875rem;
+      }
+
+      &-filter {
         &--disabled {
           opacity: 0.4;
-          pointer-events: none !important;
+          pointer-events: none;
+        }
+      }
+
+      &-stickers {
+        padding: 1rem;
+        height: calc(100vh - 10rem);
+      }
+
+      &-list {
+        .btn-menu-item {
+          height: 3rem;
+
+          &.active {
+            background-color: var(--light-secondary-text-color);
+
+            .image-editor-sidebar-settings-list-btn-icon--brush {
+              width: 120px;
+            }
+          }
         }
 
-        &-icon {
-          &--brush {
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            margin-right: 1rem;
-            justify-content: flex-end;
-            width: 84px;
-            transition: width .2s 0s ease-out;
+        &-btn {
+          &--disabled {
+            opacity: 0.4;
+            pointer-events: none !important;
+          }
 
-            &:after {
-              content: '';
-              width: 16px;
-              height: 48px;
-              background: linear-gradient(270deg, rgba(33, 33, 33, 0) 0%, #212121 100%);
-              position: absolute;
-              left: 0;
-              top: -14px;
+          &-icon {
+            &--brush {
+              overflow: hidden;
+              position: relative;
+              display: flex;
+              margin-right: 1rem;
+              justify-content: flex-end;
+              width: 84px;
+              transition: width .2s 0s ease-out;
+
+              &:after {
+                content: '';
+                width: 16px;
+                height: 48px;
+                background: linear-gradient(270deg, rgba(33, 33, 33, 0) 0%, #212121 100%);
+                position: absolute;
+                left: 0;
+                top: -14px;
+              }
             }
           }
         }
       }
-    }
-  }
 
-  &-canvas {
-    max-width: 100%;
-    max-height: 100%;
-  }
+      &-cropper-format {
+        &-list {
+          padding: 0 0.1875rem;
 
-  &-cropper-format {
-    &-list {
-      padding: 0 0.1875rem;
+          .btn-menu-item {
+            height: 3rem;
 
-      .btn-menu-item {
-        height: 3rem;
+            &.active {
+              background-color: var(--light-secondary-text-color);
+            }
+          }
 
-        &.active {
-          background-color: var(--light-secondary-text-color);
+          .btn-menu-item-icon {
+            margin-top: 0.625rem;
+          }
+        }
+
+        &-compact-list {
+          display: flex;
+          flex-flow: wrap;
+
+          .btn-menu-item {
+            width: calc(50% - 10px);
+          }
+        }
+
+        &-cell--rotate {
+          transform: rotate(90deg);
         }
       }
 
-      .btn-menu-item-icon {
-        margin-top: 0.625rem;
-      }
-    }
+      &-colors {
+        &-list {
+          padding: 1.75rem 1.5rem;
+          display: flex;
+          justify-content: space-between;
+          gap: 0.5rem;
 
-    &-compact-list {
-      display: flex;
-      flex-flow: wrap;
+          &-item {
+            width: 20px;
+            height: 20px;
+            border-radius: 20px;
+            position: relative;
+            background: var(--image-editor-sidebar-settings-colors-list-item-background);
+            padding: 10px;
+            cursor: pointer;
 
-      .btn-menu-item {
-        width: calc(50% - 10px);
-      }
-    }
+            &:after {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 20px;
+              height: 20px;
+              border-radius: 20px;
+              opacity: .1;
+              background: var(--image-editor-sidebar-settings-colors-list-item-background);
+              transition: all .2s 0s ease-out;
+            }
 
-    &-cell--rotate {
-      transform: rotate(90deg);
-    }
-  }
-
-  &-colors {
-    &-list {
-      padding: 1.75rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      gap: 0.5rem;
-
-      &-item {
-        width: 20px;
-        height: 20px;
-        border-radius: 20px;
-        position: relative;
-        background: var(--image-editor-colors-list-item-background);
-        padding: 10px;
-        cursor: pointer;
-
-        &:after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 20px;
-          height: 20px;
-          border-radius: 20px;
-          opacity: .1;
-          background: var(--image-editor-colors-list-item-background);
-          transition: all .2s 0s ease-out;
-        }
-
-        &:hover:after, &.active:after {
-          top: -10px;
-          left: -10px;
-          width: 40px;
-          height: 40px;
+            &:hover:after, &.active:after {
+              top: -10px;
+              left: -10px;
+              width: 40px;
+              height: 40px;
+            }
+          }
         }
       }
-    }
-  }
 
-  &-font-styles {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 0 1rem;
+      &-font-styles {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 1rem;
 
-    .btn-icon {
-      border-radius: 10px!important;
+        .btn-icon {
+          border-radius: 10px!important;
 
-      &.active {
-        background-color: var(--light-secondary-text-color);
-        color: var(--secondary-text-color);
+          &.active {
+            background-color: var(--light-secondary-text-color);
+            color: var(--secondary-text-color);
+          }
+        }
+
+        &-aligns {
+          display: flex;
+        }
+
+        &-frames {
+          display: flex;
+        }
       }
-    }
-
-    &-aligns {
-      display: flex;
-    }
-
-    &-frames {
-      display: flex;
     }
   }
 }

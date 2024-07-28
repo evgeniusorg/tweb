@@ -1,10 +1,16 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import {Colors, SIZE_RANGE_STEP} from '../constants';
 import {attachClickEvent} from '../../../../../helpers/dom/clickEvent';
 import findUpClassName from '../../../../../helpers/dom/findUpClassName';
 import {RangeSettingSelector} from '../../../../rangeSettingSelector';
 
 export function selectColor(element: HTMLElement, color: string) {
-  const colorBtns = element.getElementsByClassName('image-editor-colors-list-item');
+  const colorBtns = element.getElementsByClassName('image-editor-sidebar-settings-colors-list-item');
   for(let i = 0; i < colorBtns.length; i++) {
     const colorBtn = colorBtns[i] as HTMLDivElement;
     if(colorBtn.dataset.value === color) {
@@ -17,12 +23,12 @@ export function selectColor(element: HTMLElement, color: string) {
 
 export function getColorsList(initColor: string, callback: (value: string) => void) {
   const colorsList = document.createElement('div');
-  colorsList.classList.add('image-editor-colors-list');
+  colorsList.classList.add('image-editor-sidebar-settings-colors-list');
 
   Object.entries(Colors).forEach(([type, value]) => {
     const colorBtn = document.createElement('div');
-    colorBtn.classList.add('image-editor-colors-list-item');
-    colorBtn.style.setProperty('--image-editor-colors-list-item-background', value);
+    colorBtn.classList.add('image-editor-sidebar-settings-colors-list-item');
+    colorBtn.style.setProperty('--image-editor-sidebar-settings-colors-list-item-background', value);
     colorBtn.dataset.value = value;
 
     if(initColor === value) {
@@ -33,7 +39,7 @@ export function getColorsList(initColor: string, callback: (value: string) => vo
   });
 
   attachClickEvent(colorsList, (e) => {
-    const colorBtn = findUpClassName(e.target, 'image-editor-colors-list-item');
+    const colorBtn = findUpClassName(e.target, 'image-editor-sidebar-settings-colors-list-item');
 
     if(!colorBtn) {
       return;

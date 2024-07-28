@@ -1,3 +1,9 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import {
   BRUSHES, BrushStyles,
   Colors,
@@ -19,7 +25,7 @@ export function replaceBrushColorOnText(text: string, color: string) {
 }
 export function updateActiveBrushBtnColor(brushBtn: HTMLElement, color: string, brushIcons: BrushIconsList) {
   const brushStyle = brushBtn.dataset.style;
-  const btnIcon = brushBtn.getElementsByClassName('image-editor-settings-list-btn-icon--brush')[0];
+  const btnIcon = brushBtn.getElementsByClassName('image-editor-sidebar-settings-list-btn-icon--brush')[0];
   const btnIconImg = document.createElement('img');
   const iconText = replaceBrushColorOnText(brushIcons[brushStyle  as BrushStyles].text, color);
 
@@ -39,18 +45,18 @@ function getBrushesList(
   updateHistory: () => void
 ) {
   const brushesList = document.createElement('div');
-  brushesList.classList.add('image-editor-settings-list');
+  brushesList.classList.add('image-editor-sidebar-settings-list');
 
   BRUSHES.forEach(({style, langKey, iconUrl, disabled}) => {
     const btn = document.createElement('div');
-    btn.classList.add('btn-menu-item', 'rp-overflow', 'image-editor-settings-list-btn');
+    btn.classList.add('btn-menu-item', 'rp-overflow', 'image-editor-sidebar-settings-list-btn');
 
     if(disabled) {
-      btn.classList.add('image-editor-settings-list-btn--disabled');
+      btn.classList.add('image-editor-sidebar-settings-list-btn--disabled');
     }
 
     const btnIcon = document.createElement('div');
-    btnIcon.classList.add('image-editor-settings-list-btn-icon--brush');
+    btnIcon.classList.add('image-editor-sidebar-settings-list-btn-icon--brush');
     const btnIconImg = document.createElement('img');
 
     const icon = brushIcons[style].url;
@@ -79,7 +85,7 @@ function getBrushesList(
   });
 
   attachClickEvent(brushesList, (e) => {
-    const brushBtn = findUpClassName(e.target, 'image-editor-settings-list-btn');
+    const brushBtn = findUpClassName(e.target, 'image-editor-sidebar-settings-list-btn');
 
     if(!brushBtn) {
       return;
@@ -130,7 +136,7 @@ export function showImageBrushes(
     updateRangeSelectorColor(element, color);
 
     const activeBrushBtn = element
-    .getElementsByClassName('image-editor-settings-list-btn active')[0] as HTMLElement;
+    .getElementsByClassName('image-editor-sidebar-settings-list-btn active')[0] as HTMLElement;
     updateActiveBrushBtnColor(activeBrushBtn, color, brushIcons);
   };
 
@@ -160,7 +166,7 @@ export function showImageBrushes(
   updateRangeSelectorColor(brushSettings, state.brushSettings.color);
 
   const title = document.createElement('div');
-  title.classList.add('image-editor-settings-block-title');
+  title.classList.add('image-editor-sidebar-settings-block-title');
   _i18n(title, 'ImageEditor.Brush.Title');
   brushSettings.append(title);
 

@@ -1,3 +1,9 @@
+/*
+ * https://github.com/evgeniusorg/tweb/tree/image_editor
+ * Copyright (C) 2024 Eugene Chugunov
+ * https://github.com/morethanwords/tweb/blob/master/LICENSE
+ */
+
 import {FILTERS} from '../constants';
 import {RangeSettingSelector} from '../../../../rangeSettingSelector';
 import {LangPackKey} from '../../../../../lib/langPack';
@@ -35,7 +41,7 @@ export function showImageFilters(element: HTMLElement, state: State, reRenderCan
 
     const filterContainer = document.createElement('div');
     if(filter.disabled) {
-      filterContainer.classList.add('image-editor-settings-filter--disabled');
+      filterContainer.classList.add('image-editor-sidebar-settings-filter--disabled');
     }
 
     filterContainer.append(range.container);
